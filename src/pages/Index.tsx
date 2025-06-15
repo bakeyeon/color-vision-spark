@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { assignClusterGroup, ClusterGroup } from "@/lib/userCluster";
 import ResultSummary from "@/components/ResultSummary";
 import { Share } from "lucide-react";
+import FishComparison from "@/components/FishComparison";
 
 // Marine group names and descriptions
 const groupDetails: Record<
@@ -56,6 +56,47 @@ const groupDetails: Record<
     emoji: "🐡"
   }
 };
+
+const fishList: Array<{ id: number; name: string; emoji: string; description: string }> = [
+  { id: 1, name: "Blue Marlin", emoji: "🐟", description: "Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes." },
+  { id: 2, name: "Pufferfish", emoji: "🐡", description: "Round, slow to color differences but stable." },
+  { id: 3, name: "Mandarinfish", emoji: "🐠", description: "Extreme color enthusiast. Rich in language sense." },
+  { id: 4, name: "Loach", emoji: "🦠", description: "Text-centric brain, insensitive to color." },
+  { id: 5, name: "Squid", emoji: "🦑", description: "Weak in color recognition but rich in imagination." },
+  { id: 6, name: "Flatfish", emoji: "🦦", description: "Slow in response, focused on context rather than color." },
+  { id: 7, name: "Mola mola", emoji: "🐡", description: "A user who skipped more than half the questions - a delicate boss surprisingly weak to stress despite the highest weight class in the ocean!" }
+];
+
+// Utility: picks, given the user's main group, the next closest group deterministically, prioritizing 6 (flatfish) and 7 (mola mola) if not assigned
+function getClosestFish(userGroup: number): [typeof fishList[0], typeof fishList[0]] {
+  const userIdx = fishList.findIndex(f => f.id === userGroup);
+  if (userIdx === -1) {
+    // fallback: show flatfish & mola mola
+    const flatfish = fishList.find(f => f.name.toLowerCase() === "flatfish")!;
+    const mola = fishList.find(f => f.name.toLowerCase().includes("mola"))!;
+    return [mola, flatfish];
+  }
+  // Pick the user's own persona as the left
+  const mainFish = fishList[userIdx];
+  // If main is 7 (mola mola), next closest is flatfish
+  if (mainFish.id === 7) {
+    const flatfish = fishList.find(f => f.id === 6)!;
+    return [mainFish, flatfish];
+  }
+  // If main is 6 (flatfish), next closest is mola mola
+  if (mainFish.id === 6) {
+    const mola = fishList.find(f => f.id === 7)!;
+    return [mainFish, mola];
+  }
+  // Otherwise pick flatfish (6) as next closest unless already main, else the next in the list
+  const flatfish = fishList.find(f => f.id === 6)!;
+  if (mainFish.id !== 6) {
+    return [mainFish, flatfish];
+  }
+  // Fallback: pick the next index as right
+  const next = fishList[(userIdx + 1) % fishList.length];
+  return [mainFish, next];
+}
 
 const AppHome: React.FC = () => {
   // Phases: intro -> experiment -> questionnaire -> summary
@@ -231,40 +272,13 @@ const AppHome: React.FC = () => {
                 </table>
               </div>
 
-              {/* FISH COMPARISON SECTION */}
-              <div className="mb-8 flex flex-col items-center w-full">
-                <div className="text-lg font-semibold mb-4 text-center">
-                  Which fish are closest to me?
-                </div>
-                <div className="w-full flex flex-col md:flex-row gap-4 justify-center items-stretch">
-                  {/* Mola mola */}
-                  <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col items-center shadow-sm">
-                    {/* Placeholder for image */}
-                    <div className="w-24 h-24 mb-2 rounded-full bg-gray-200 flex items-center justify-center text-5xl">
-                      {/* Replace with <img /> when asset ready */}
-                      <span className="text-4xl" role="img" aria-label="Mola Mola">🐡</span>
-                    </div>
-                    <div className="font-bold text-blue-800 text-base mb-1">mola mola</div>
-                    <div className="text-sm text-gray-700 text-center">
-                      A delicate marine artist with intuitive judgment and sharp standards.<br/>
-                      Sometimes skips answers with&nbsp;<span className="font-semibold">unique sense 💎</span>
-                    </div>
-                  </div>
-                  {/* Flatfish */}
-                  <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col items-center shadow-sm">
-                    {/* Placeholder for image */}
-                    <div className="w-24 h-24 mb-2 rounded-full bg-gray-200 flex items-center justify-center text-5xl">
-                      {/* Replace with <img /> when asset ready */}
-                      <span className="text-4xl" role="img" aria-label="Flatfish">🦦</span>
-                    </div>
-                    <div className="font-bold text-blue-800 text-base mb-1">flatfish</div>
-                    <div className="text-sm text-gray-700 text-center">
-                      Slow responder, more interested in context than color.<br/>
-                      Reads between the lines and trusts analysis, not just sight!
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Dynamically rendered fish comparison section */}
+              {clusterGroup !== null && (
+                <FishComparison
+                  left={getClosestFish(clusterGroup)[0]}
+                  right={getClosestFish(clusterGroup)[1]}
+                />
+              )}
 
               {/* Centered share button */}
               <div className="flex justify-center mt-4">
@@ -290,4 +304,3 @@ const AppHome: React.FC = () => {
 export default AppHome;
 
 // NOTE TO USER: This file is now over 260 lines. Please consider asking to refactor into multiple smaller components for maintainability.
-
