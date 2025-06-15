@@ -9,10 +9,9 @@ import { toast } from "@/hooks/use-toast";
 interface TrialResult {
   trial: number;
   numBlocks: number;
-  start: number;
-  end: number;
   estimate: number | null;
   duration: number;
+  subtle: boolean;
 }
 
 const TRIALS_COUNT = 6;
@@ -92,12 +91,13 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
     setTimerOn(false);
 
     const result: TrialResult = {
-      ...tCfg,
-      start: trialStart ?? 0,
-      end: trialEnd,
+      trial: tCfg.trial,
+      numBlocks: tCfg.numBlocks,
+      subtle: tCfg.subtle,
       estimate,
-      duration: (trialEnd - (trialStart ?? trialEnd)) / 1000,
+      duration: (trialEnd - (trialStart ?? trialEnd)) / 1000
     };
+
     setAnswers((prev) => [...prev, result]);
 
     setTimeout(() => {
@@ -173,7 +173,6 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
             Submit
           </Button>
         </form>
-        {/* Timer is now hidden per user request */}
       </CardFooter>
     </Card>
   );

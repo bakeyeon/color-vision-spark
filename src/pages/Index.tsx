@@ -80,7 +80,6 @@ const AppHome: React.FC = () => {
                     <tr className="bg-muted">
                       <th className="px-2 py-1 text-xs font-medium text-left">#</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Bar</th>
-                      <th className="px-2 py-1 text-xs font-medium text-left">Orientation</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Transition</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Est. Segments</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Actual Blocks</th>
@@ -92,7 +91,6 @@ const AppHome: React.FC = () => {
                       <tr key={i} className="odd:bg-background even:bg-muted/50">
                         <td className="px-2 py-1">{i + 1}</td>
                         <td className="px-2 py-1">▇</td>
-                        <td className="px-2 py-1">{res.orientation}</td>
                         <td className="px-2 py-1">{res.subtle ? 'Subtle' : 'Distinct'}</td>
                         <td className="px-2 py-1 font-bold">{res.estimate}</td>
                         <td className="px-2 py-1">{res.numBlocks}</td>
@@ -135,3 +133,4 @@ const AppHome: React.FC = () => {
 };
 
 export default AppHome;
+
