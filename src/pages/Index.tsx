@@ -119,11 +119,7 @@ const AppHome: React.FC = () => {
                   {" → "}
                   <span className="font-medium text-blue-300">light blue</span>
                   {" → "}
-                  <span className="font-medium text-blue-800">dark blue</span>
-                  {" → "}
-                  <span className="font-medium text-cyan-600">cyan</span>
-                  {" → "}
-                  <span className="font-medium text-green-700">green</span>.
+                  <span className="font-medium text-blue-800">dark blue</span>.
                 </li>
                 <li>
                   Some trials use <span className="text-blue-400/70">subtle gradients</span>; others use sharper divisions.
