@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
@@ -79,26 +78,26 @@ const AppHome: React.FC = () => {
       : null;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center px-2 lg:px-0">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
-        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
+        <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif">
           Color Gradient Perception Experiment
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mb-2">
+        <p className="text-lg text-blue-500 max-w-2xl mb-2">
           Test your ability to detect subtle color transitions.
         </p>
       </header>
 
       <main className="flex flex-col items-center w-full">
         {phase === "intro" && (
-          <Card className="max-w-2xl w-full mx-auto border-2 shadow-lg">
+          <Card className="max-w-2xl w-full mx-auto border-2 shadow-xl bg-white/90 backdrop-blur-sm ring-1 ring-blue-300">
             <CardHeader>
               <CardTitle>
-                🐟 What kind of fish are you?
+                🐟 <span className="text-blue-700 drop-shadow">What kind of fish are you?</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-base text-muted-foreground">
-              <div className="italic text-primary mb-2">"Among fish that react to colors, what kind of visual-linguistic sense are you?"</div>
+            <CardContent className="text-base text-blue-700">
+              <div className="italic text-blue-600 mb-2">"Among fish that react to colors, what kind of visual-linguistic sense are you?"</div>
               <p className="mb-3">
                 The way we see colors varies from person to person.
                 <br /><br />
@@ -106,31 +105,44 @@ const AppHome: React.FC = () => {
                 <br /><br />
                 Like fish swimming in the ocean, our senses also read the world in different patterns.
                 <br />
-                <span className="font-semibold">What kind of color sense are you?</span>
+                <span className="font-semibold text-blue-900">What kind of color sense are you?</span>
               </p>
-              <ul className="list-disc ml-5 mb-2">
+              <ul className="list-disc ml-5 mb-2 text-blue-700/90">
                 <li>
-                  You'll be shown a color gradient bar made of <b>8–30 adjacent blocks</b> per trial, always smoothly aligned.
+                  You'll be shown a color gradient bar made of <b className="text-blue-900">8–30 adjacent blocks</b> per trial, always smoothly aligned.
                 </li>
                 <li>
-                  <b>Your task:</b> Count how many perceptually distinct color segments (visible divisions) you can spot—even if the colors seem very similar!
+                  <b className="text-blue-900">Your task:</b> Count how many perceptually distinct color segments (visible divisions) you can spot—even if the colors seem very similar!
                 </li>
                 <li>
-                  Colors always move smoothly from <span className="font-medium text-blue-700">white</span> → <span className="font-medium text-blue-400">light blue</span> → <span className="font-medium text-blue-800">dark blue</span> → <span className="font-medium text-cyan-600">cyan</span> → <span className="font-medium text-green-700">green</span>.
+                  Colors always move smoothly from <span className="font-medium text-blue-600">white</span>
+                  {" → "}
+                  <span className="font-medium text-blue-300">light blue</span>
+                  {" → "}
+                  <span className="font-medium text-blue-800">dark blue</span>
+                  {" → "}
+                  <span className="font-medium text-cyan-600">cyan</span>
+                  {" → "}
+                  <span className="font-medium text-green-700">green</span>.
                 </li>
                 <li>
-                  Some trials use <span className="text-muted-foreground">subtle gradients</span>; others use sharper divisions.
+                  Some trials use <span className="text-blue-400/70">subtle gradients</span>; others use sharper divisions.
                 </li>
               </ul>
-              <div className="mb-4">Click "Start" when you're ready. There is no time limit, and your response time will be recorded.</div>
-              <hr className="my-4" />
-              <div className="text-xs text-center text-muted-foreground leading-snug">
+              <div className="mb-4 text-blue-900">Click <span className="px-2 py-1 bg-blue-100 rounded font-medium">Start</span> when you're ready. There is no time limit, and your response time will be recorded.</div>
+              <hr className="my-4 border-blue-200" />
+              <div className="text-xs text-center text-blue-500 leading-snug">
                 * Your participation is voluntary and all data collected will be used for research purposes only.<br />
-                If you have any questions, please contact <a href="mailto:hyeyeon.park@hhu.de" className="underline">hyeyeon.park@hhu.de</a>.
+                If you have any questions, please contact <a href="mailto:hyeyeon.park@hhu.de" className="underline text-blue-700">hyeyeon.park@hhu.de</a>.
               </div>
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
-              <Button onClick={start}>Start Experiment</Button>
+              <Button
+                className="bg-gradient-to-r from-blue-400 via-blue-600 to-cyan-500 text-white shadow"
+                onClick={start}
+              >
+                Start Experiment
+              </Button>
             </CardFooter>
           </Card>
         )}
