@@ -173,6 +173,9 @@ const AppHome: React.FC = () => {
 
   const start = () => setPhase("experiment");
 
+  // New: state for table toggle
+  const [showTrialData, setShowTrialData] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
@@ -272,41 +275,56 @@ const AppHome: React.FC = () => {
                 />
               )}
 
-              <div className="text-base mb-2 font-semibold">
-                Your trial data:
+              {/* Button to show/hide trial data */}
+              <div className="my-4 flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowTrialData((prev) => !prev)}
+                  aria-expanded={showTrialData}
+                  aria-controls="trial-data-table"
+                  className="font-medium"
+                >
+                  {showTrialData ? "Hide full trial data" : "Check your full trial data"}
+                </Button>
               </div>
-              <div className="overflow-x-auto mb-6">
-                <table className="w-full border">
-                  <thead>
-                    <tr className="bg-muted">
-                      <th className="px-2 py-1 text-xs font-medium text-left">#</th>
-                      <th className="px-2 py-1 text-xs font-medium text-left">Bar</th>
-                      <th className="px-2 py-1 text-xs font-medium text-left">Transition</th>
-                      <th className="px-2 py-1 text-xs font-medium text-left">Level</th>
-                      <th className="px-2 py-1 text-xs font-medium text-left">Est. Segments</th>
-                      <th className="px-2 py-1 text-xs font-medium text-left">Actual Blocks</th>
-                      <th className="px-2 py-1 text-xs font-medium text-left">Time (s)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {results.map((res, i) => (
-                      <tr key={i} className="odd:bg-background even:bg-muted/50">
-                        <td className="px-2 py-1">{i + 1}</td>
-                        <td className="px-2 py-1">▇</td>
-                        <td className="px-2 py-1">{res.subtle ? "Subtle" : "Distinct"}</td>
-                        <td className="px-2 py-1">
-                          {res.level === 1 ? "Norm." : res.level === 2 ? "Subtle" : "Extra"}
-                        </td>
-                        <td className="px-2 py-1 font-bold">{res.estimate}</td>
-                        <td className="px-2 py-1">{res.numBlocks}</td>
-                        <td className="px-2 py-1">{res.duration.toFixed(1)}</td>
+              
+              {showTrialData && (
+                <div id="trial-data-table" className="overflow-x-auto mb-6 animate-fade-in">
+                  <div className="text-base mb-2 font-semibold">
+                    Your trial data:
+                  </div>
+                  <table className="w-full border">
+                    <thead>
+                      <tr className="bg-muted">
+                        <th className="px-2 py-1 text-xs font-medium text-left">#</th>
+                        <th className="px-2 py-1 text-xs font-medium text-left">Bar</th>
+                        <th className="px-2 py-1 text-xs font-medium text-left">Transition</th>
+                        <th className="px-2 py-1 text-xs font-medium text-left">Level</th>
+                        <th className="px-2 py-1 text-xs font-medium text-left">Est. Segments</th>
+                        <th className="px-2 py-1 text-xs font-medium text-left">Actual Blocks</th>
+                        <th className="px-2 py-1 text-xs font-medium text-left">Time (s)</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {results.map((res, i) => (
+                        <tr key={i} className="odd:bg-background even:bg-muted/50">
+                          <td className="px-2 py-1">{i + 1}</td>
+                          <td className="px-2 py-1">▇</td>
+                          <td className="px-2 py-1">{res.subtle ? "Subtle" : "Distinct"}</td>
+                          <td className="px-2 py-1">
+                            {res.level === 1 ? "Norm." : res.level === 2 ? "Subtle" : "Extra"}
+                          </td>
+                          <td className="px-2 py-1 font-bold">{res.estimate}</td>
+                          <td className="px-2 py-1">{res.numBlocks}</td>
+                          <td className="px-2 py-1">{res.duration.toFixed(1)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
-              {/* Dynamically rendered fish comparison section, now using exclusion */}
+              {/* FishComparison */}
               {clusterGroup !== null && (
                 <FishComparison
                   left={getClosestOtherFish(clusterGroup)[0]}
