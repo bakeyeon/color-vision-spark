@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import GradientBar from "./GradientBar";
 import { Button } from "@/components/ui/button";
@@ -18,9 +17,9 @@ interface TrialResult {
 
 const TRIALS_COUNT = 12;
 
-const BASE_BLUE = [0, 56, 168];
-const WHITE = [255, 255, 255];
-const INTERMEDIATE_ENDPOINTS = [
+const BASE_BLUE: [number, number, number] = [0, 56, 168];
+const WHITE: [number, number, number] = [255, 255, 255];
+const INTERMEDIATE_ENDPOINTS: [number, number, number][] = [
   [100, 150, 255], // Pale blue
   [94, 166, 246],  // Powder blue
   [143, 180, 240], // Sky-ish
@@ -28,8 +27,7 @@ const INTERMEDIATE_ENDPOINTS = [
 ];
 
 // Generate a gradient endpoint that’s always “between blue and white”
-function randomEndpoint() {
-  // 50% chance for white, 30% for intermediate, 20% for "deeper" blue (closer to base)
+function randomEndpoint(): [number, number, number] {
   const r = Math.random();
   if (r < 0.2) return BASE_BLUE;
   if (r < 0.5) return INTERMEDIATE_ENDPOINTS[Math.floor(Math.random() * INTERMEDIATE_ENDPOINTS.length)];
@@ -40,11 +38,10 @@ function randomInt(min: number, max: number) {
   return min + Math.floor(Math.random() * (max - min + 1));
 }
 
-// Generate all trials up front with balanced/difficulty levels
+// Difficulty configuration
 function generateTrialSet() {
-  // 2 easy, 2 subtle, 2 super subtle, repeat/shuffle to make 12
-  const blocksConfig = [
-    // [min, max, subtle, level]
+  // [min, max, subtle, level]
+  const blocksConfig: [number, number, boolean, number][] = [
     [8, 15, false, 1],
     [9, 17, false, 1],
 
@@ -56,20 +53,19 @@ function generateTrialSet() {
   ];
   // Duplicate to make 12
   let configs = [...blocksConfig, ...blocksConfig];
-  // Shuffle for randomness
+  // Shuffle
   for (let i = configs.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [configs[i], configs[j]] = [configs[j], configs[i]];
   }
-  return configs.map(([minB, maxB, subtle, level], i) => {
-    return {
-      trial: i + 1,
-      numBlocks: randomInt(minB, maxB),
-      subtle,
-      level,
-      colorEnd: randomEndpoint(),
-    };
-  });
+  // Map to structure
+  return configs.map(([minB, maxB, subtle, level], i) => ({
+    trial: i + 1,
+    numBlocks: randomInt(minB, maxB),
+    subtle: subtle,
+    level: level,
+    colorEnd: randomEndpoint(),
+  }));
 }
 
 interface ExperimentPanelProps {
@@ -83,7 +79,7 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
   const [timerOn, setTimerOn] = useState(false);
   const [trialStart, setTrialStart] = useState<number | null>(null);
 
-  // Define all trial config up front
+  // Define all trials up front
   const trials = React.useMemo(() => generateTrialSet(), []);
 
   // Timer logic
@@ -130,7 +126,7 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       estimate,
       duration: (trialEnd - (trialStart ?? trialEnd)) / 1000,
       level: tCfg.level,
-      colorEnd: tCfg.colorEnd
+      colorEnd: tCfg.colorEnd, // Should always be [number, number, number]
     };
 
     setAnswers((prev) => [...prev, result]);
@@ -148,7 +144,6 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
 
   const current = trials[trialIdx];
 
-  // Subtlety: disables grid lines for "subtle" mode, else enables soft borders
   return (
     <Card className="max-w-3xl w-full mx-auto mt-8 shadow-xl border-2">
       <CardHeader>
