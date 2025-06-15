@@ -1,3 +1,4 @@
+
 import React from "react";
 import { groupImages } from "./ResultSummary";
 
@@ -17,8 +18,7 @@ interface FishComparisonProps {
 }
 
 const FishComparison: React.FC<FishComparisonProps> = ({ left, right, mainFishId }) => {
-  // Get image for mainFishId, if provided
-  const mainFishImg = mainFishId && groupImages[mainFishId as keyof typeof groupImages];
+  // Removed main fish image above comparison row
 
   if (!left || !right) {
     return (
@@ -33,21 +33,7 @@ const FishComparison: React.FC<FishComparisonProps> = ({ left, right, mainFishId
       <div className="text-lg font-semibold mb-4 text-center">
         Which fish are closest to me?
       </div>
-      {/* Show main fish image above comparison row if available */}
-      {mainFishImg?.src && (
-        <div className="flex justify-center mb-4">
-          <img
-            src={mainFishImg.src}
-            alt={mainFishImg.alt}
-            className="w-20 h-20 object-contain rounded-xl border-[6px] border-white"
-            style={{
-              background: "linear-gradient(180deg, #a5e4ff 0%, #fafeff 100%)",
-              boxShadow: "0 0 0 8px #2772ed", // 8px thick blue border (proportionally)
-              borderColor: "#fff",
-            }}
-          />
-        </div>
-      )}
+      {/* Removed: Main fish image previously displayed here */}
       <div className="w-full flex flex-col md:flex-row gap-4 justify-center items-stretch">
         {/* Left Fish */}
         <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col items-center shadow-sm">

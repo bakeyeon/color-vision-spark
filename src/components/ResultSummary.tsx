@@ -137,13 +137,13 @@ const ResultSummary: React.FC<ResultSummaryProps> = ({
 
   return (
     <div className="flex flex-col items-center gap-2 mb-8">
-      {/* Fish image for this group */}
+      {/* Fish image for this group - now circular */}
       <div className="flex justify-center items-center mb-2">
         {fishImage?.src ? (
           <img
             src={fishImage.src}
             alt={fishImage.alt}
-            className="w-52 h-52 object-contain rounded-xl shadow-lg border-[8px] border-white"
+            className="w-52 h-52 object-contain rounded-full shadow-lg border-[8px] border-white"
             style={{
               background: "linear-gradient(180deg, #a5e4ff 0%, #fafeff 100%)",
               boxShadow: "0 0 0 20px #2772ed", // 20px thick blue border
