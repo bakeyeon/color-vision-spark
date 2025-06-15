@@ -52,7 +52,7 @@ const groupDetails: Record<
   7: {
     name: "Mola mola",
     description:
-      'A user who skipped more than half the questions - "I don\'t like the question..." A delicate boss surprisingly weak to stress despite the highest weight class in the ocean!',
+      "a delicate boss surprisingly weak to stress despite the highest weight class in the ocean!",
     emoji: "🐡"
   }
 };
@@ -206,6 +206,31 @@ const AppHome: React.FC = () => {
     const userPercentile = ((userBinIdx + 1) / bins) * 100;
     return { data, userBin, userPercentile };
   }
+
+  // Calculate correctRate and avgSpeed, memoize for stability. Only update when results change.
+  const correctRate = useMemo(() => {
+    if (!results.length) return 0;
+    const N = results.length;
+    const valid = results.filter(r => r.estimate !== null && Number.isFinite(r.estimate));
+    const correct = valid.filter(r => Math.abs((r.estimate ?? 0) - r.numBlocks) <= 1); // consider +/-1 margin
+    return valid.length ? correct.length / valid.length : 0;
+  }, [results]);
+
+  const avgSpeed = useMemo(() => {
+    if (!results.length) return 0;
+    const valid = results.filter(r => Number.isFinite(r.duration));
+    const sum = valid.reduce((acc, r) => acc + (r.duration ?? 0), 0);
+    return valid.length ? sum / valid.length : 0;
+  }, [results]);
+
+  // Memoize the histogram data using results and clusterGroup as dependencies
+  const memoizedHistogram = useMemo(() => {
+    const rate100 = Math.round(correctRate * 100);
+    return {
+      corrData: makeHistogramData(rate100, 8, 0, 100),
+      spdData: makeHistogramData(avgSpeed, 6, 1, 15)
+    };
+  }, [correctRate, avgSpeed, clusterGroup]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
@@ -385,4 +410,4 @@ const AppHome: React.FC = () => {
 
 export default AppHome;
 
-// NOTE TO USER: This file is now over 260 lines. Please consider asking to refactor into multiple smaller components for maintainability.
+// NOTE TO USER: This file is very long and should be refactored into smaller components for better maintainability.
