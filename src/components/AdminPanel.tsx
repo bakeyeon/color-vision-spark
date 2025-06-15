@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, Download, FileText } from "lucide-react";
+import { LogOut, Download, FileText, Users, TrendingUp, Fish } from "lucide-react";
 import { type TrialResult } from "./ExperimentPanel";
 import { type QuestionnaireData } from "./Questionnaire";
 import PasswordChangeDialog from "./PasswordChangeDialog";
@@ -96,8 +98,8 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
 
     const csvRows = [];
     
-    // CSV Header
-    csvRows.push([
+    // Create CSV Header with T1-T12 columns
+    const header = [
       'Participant',
       'Age Group',
       'Country',
@@ -105,61 +107,71 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
       'Language',
       'Media Type',
       'Media Kind',
-      'Media Hours',
-      'Trial Number',
-      'Estimate',
-      'Actual',
-      'Duration (s)',
-      'Level',
-      'Subtle',
-      'Submitted At'
-    ].join(','));
+      'Media Hours'
+    ];
+    
+    // Add T1-T12 Estimate columns
+    for (let i = 1; i <= 12; i++) {
+      header.push(`T${i} Estimate`);
+    }
+    
+    // Add T1-T12 Actual columns
+    for (let i = 1; i <= 12; i++) {
+      header.push(`T${i} Actual`);
+    }
+    
+    // Add T1-T12 Duration columns
+    for (let i = 1; i <= 12; i++) {
+      header.push(`T${i} Duration`);
+    }
+    
+    // Add T1-T12 Level columns
+    for (let i = 1; i <= 12; i++) {
+      header.push(`T${i} Level`);
+    }
+    
+    header.push('Submitted At');
+    csvRows.push(header.join(','));
 
-    // CSV Data
+    // CSV Data - one row per participant
     data.forEach((entry, participantIndex) => {
       const participantNum = participantIndex + 1;
       const q = entry.questionnaire;
       
+      const row = [
+        participantNum,
+        q?.ageGroup || '',
+        q?.country || '',
+        q?.yearsInCountry || '',
+        q?.language || '',
+        q?.mediaType || '',
+        q?.mediaKind || '',
+        q?.mediaHours || ''
+      ];
+      
+      // Initialize arrays for trial data
+      const estimates = new Array(12).fill('');
+      const actuals = new Array(12).fill('');
+      const durations = new Array(12).fill('');
+      const levels = new Array(12).fill('');
+      
+      // Fill in trial data if available
       if (entry.experiment && entry.experiment.length > 0) {
-        entry.experiment.forEach((trial, trialIndex) => {
-          csvRows.push([
-            participantNum,
-            q?.ageGroup || '',
-            q?.country || '',
-            q?.yearsInCountry || '',
-            q?.language || '',
-            q?.mediaType || '',
-            q?.mediaKind || '',
-            q?.mediaHours || '',
-            trialIndex + 1,
-            trial.estimate,
-            trial.numBlocks,
-            trial.duration.toFixed(1),
-            trial.level,
-            trial.subtle ? 'Yes' : 'No',
-            entry.submitted_at
-          ].map(field => `"${field}"`).join(','));
+        entry.experiment.forEach((trial, index) => {
+          if (index < 12) {
+            estimates[index] = trial.estimate;
+            actuals[index] = trial.numBlocks;
+            durations[index] = trial.duration.toFixed(1);
+            levels[index] = trial.level;
+          }
         });
-      } else {
-        // If no experiment data, still include questionnaire data
-        csvRows.push([
-          participantNum,
-          q?.ageGroup || '',
-          q?.country || '',
-          q?.yearsInCountry || '',
-          q?.language || '',
-          q?.mediaType || '',
-          q?.mediaKind || '',
-          q?.mediaHours || '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          entry.submitted_at
-        ].map(field => `"${field}"`).join(','));
       }
+      
+      // Add all trial data to row
+      row.push(...estimates, ...actuals, ...durations, ...levels);
+      row.push(entry.submitted_at);
+      
+      csvRows.push(row.map(field => `"${field}"`).join(','));
     });
 
     const csvContent = csvRows.join('\n');
@@ -178,6 +190,58 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
       description: "Data has been downloaded as CSV file.",
     });
   };
+
+  // Calculate overview statistics
+  const getOverviewStats = () => {
+    if (data.length === 0) {
+      return {
+        totalParticipants: 0,
+        averageScore: 0,
+        mostUsedMediaType: 'N/A'
+      };
+    }
+
+    const totalParticipants = data.length;
+    
+    // Calculate average score (accuracy)
+    let totalAccuracy = 0;
+    let totalTrials = 0;
+    
+    data.forEach(entry => {
+      if (entry.experiment && entry.experiment.length > 0) {
+        entry.experiment.forEach(trial => {
+          const accuracy = Math.abs(trial.estimate - trial.numBlocks) / trial.numBlocks;
+          totalAccuracy += (1 - accuracy) * 100; // Convert to percentage accuracy
+          totalTrials++;
+        });
+      }
+    });
+    
+    const averageScore = totalTrials > 0 ? totalAccuracy / totalTrials : 0;
+    
+    // Find most used media type
+    const mediaTypeCounts: { [key: string]: number } = {};
+    data.forEach(entry => {
+      if (entry.questionnaire?.mediaType) {
+        mediaTypeCounts[entry.questionnaire.mediaType] = 
+          (mediaTypeCounts[entry.questionnaire.mediaType] || 0) + 1;
+      }
+    });
+    
+    const mostUsedMediaType = Object.keys(mediaTypeCounts).length > 0 
+      ? Object.keys(mediaTypeCounts).reduce((a, b) => 
+          mediaTypeCounts[a] > mediaTypeCounts[b] ? a : b
+        )
+      : 'N/A';
+    
+    return {
+      totalParticipants,
+      averageScore: Math.round(averageScore * 10) / 10,
+      mostUsedMediaType
+    };
+  };
+
+  const overviewStats = getOverviewStats();
 
   return (
     <div className="p-6">
@@ -209,63 +273,119 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-6">
-          {data.map((entry, index) => (
-            <Card key={index}>
-              <CardHeader>
-                <CardTitle>Participant {index + 1}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {entry.questionnaire && (
-                  <div className="mb-4">
-                    <h3 className="font-semibold mb-2">Questionnaire Data:</h3>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div><strong>Age Group:</strong> {entry.questionnaire.ageGroup}</div>
-                      <div><strong>Country:</strong> {entry.questionnaire.country}</div>
-                      <div><strong>Years in Country:</strong> {entry.questionnaire.yearsInCountry}</div>
-                      <div><strong>Language:</strong> {entry.questionnaire.language}</div>
-                      <div><strong>Media Type:</strong> {entry.questionnaire.mediaType}</div>
-                      <div><strong>Media Kind:</strong> {entry.questionnaire.mediaKind}</div>
-                      <div><strong>Media Hours:</strong> {entry.questionnaire.mediaHours}</div>
-                    </div>
-                  </div>
-                )}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="data">Data</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Participants
+                  </CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{overviewStats.totalParticipants}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Users who completed the experiment
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Average Accuracy
+                  </CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{overviewStats.averageScore}%</div>
+                  <p className="text-xs text-muted-foreground">
+                    Average estimation accuracy
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Most Used Media
+                  </CardTitle>
+                  <Fish className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{overviewStats.mostUsedMediaType}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Most common media type
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="data">
+            <div className="space-y-6">
+              {data.map((entry, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle>Participant {index + 1}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {entry.questionnaire && (
+                      <div className="mb-4">
+                        <h3 className="font-semibold mb-2">Questionnaire Data:</h3>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div><strong>Age Group:</strong> {entry.questionnaire.ageGroup}</div>
+                          <div><strong>Country:</strong> {entry.questionnaire.country}</div>
+                          <div><strong>Years in Country:</strong> {entry.questionnaire.yearsInCountry}</div>
+                          <div><strong>Language:</strong> {entry.questionnaire.language}</div>
+                          <div><strong>Media Type:</strong> {entry.questionnaire.mediaType}</div>
+                          <div><strong>Media Kind:</strong> {entry.questionnaire.mediaKind}</div>
+                          <div><strong>Media Hours:</strong> {entry.questionnaire.mediaHours}</div>
+                        </div>
+                      </div>
+                    )}
 
-                {entry.experiment && (
-                  <div>
-                    <h3 className="font-semibold mb-2">Experiment Results ({entry.experiment.length} trials):</h3>
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Trial</TableHead>
-                            <TableHead>Estimate</TableHead>
-                            <TableHead>Actual</TableHead>
-                            <TableHead>Duration (s)</TableHead>
-                            <TableHead>Level</TableHead>
-                            <TableHead>Subtle</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {entry.experiment.map((trial, i) => (
-                            <TableRow key={i}>
-                              <TableCell>{i + 1}</TableCell>
-                              <TableCell>{trial.estimate}</TableCell>
-                              <TableCell>{trial.numBlocks}</TableCell>
-                              <TableCell>{trial.duration.toFixed(1)}</TableCell>
-                              <TableCell>{trial.level}</TableCell>
-                              <TableCell>{trial.subtle ? "Yes" : "No"}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    {entry.experiment && (
+                      <div>
+                        <h3 className="font-semibold mb-2">Experiment Results ({entry.experiment.length} trials):</h3>
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Trial</TableHead>
+                                <TableHead>Estimate</TableHead>
+                                <TableHead>Actual</TableHead>
+                                <TableHead>Duration (s)</TableHead>
+                                <TableHead>Level</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {entry.experiment.map((trial, i) => (
+                                <TableRow key={i}>
+                                  <TableCell>{i + 1}</TableCell>
+                                  <TableCell>{trial.estimate}</TableCell>
+                                  <TableCell>{trial.numBlocks}</TableCell>
+                                  <TableCell>{trial.duration.toFixed(1)}</TableCell>
+                                  <TableCell>{trial.level}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );
