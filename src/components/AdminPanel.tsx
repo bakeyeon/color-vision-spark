@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { LogOut, Download } from "lucide-react";
 import { type TrialResult } from "./ExperimentPanel";
 import { type QuestionnaireData } from "./Questionnaire";
+import PasswordChangeDialog from "./PasswordChangeDialog";
 
 interface StoredData {
   questionnaire: QuestionnaireData | null;
@@ -89,6 +89,7 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Admin Panel - Experiment Data</h1>
         <div className="flex gap-2">
+          <PasswordChangeDialog />
           <Button onClick={downloadData} variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Download Data
