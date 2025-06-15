@@ -1,9 +1,9 @@
-
 import React, { useState } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { assignClusterGroup, ClusterGroup } from "@/lib/userCluster";
 
 const AppHome: React.FC = () => {
   const [phase, setPhase] = useState<"intro" | "experiment" | "summary" | "questionnaire" | "done">("intro");
@@ -20,6 +20,12 @@ const AppHome: React.FC = () => {
     setDemographics(d);
     setPhase("done");
   };
+
+  // Assign cluster only when summary is shown and results exist
+  const clusterGroup: ClusterGroup | null =
+    phase === "summary" && results.length > 0
+      ? assignClusterGroup({ results })
+      : null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center px-2 lg:px-0">
@@ -74,6 +80,16 @@ const AppHome: React.FC = () => {
               <div className="text-base mb-2">
                 <b>Your results:</b>
               </div>
+              {clusterGroup !== null && (
+                <div className="mb-3 flex items-center gap-2 text-primary font-bold">
+                  Your Group:{" "}
+                  <span className="border px-2 py-0.5 rounded bg-muted">
+                    {clusterGroup === 7
+                      ? "Unresponsive (no answer on most trials)"
+                      : `Cluster ${clusterGroup}`}
+                  </span>
+                </div>
+              )}
               <div className="overflow-x-auto">
                 <table className="w-full border">
                   <thead>
@@ -133,4 +149,3 @@ const AppHome: React.FC = () => {
 };
 
 export default AppHome;
-
