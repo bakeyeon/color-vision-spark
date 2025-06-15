@@ -1,10 +1,10 @@
-
 import React, { useState } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { assignClusterGroup, ClusterGroup } from "@/lib/userCluster";
+import ResultSummary from "@/components/ResultSummary";
 
 // Marine group names and descriptions
 const groupDetails: Record<
@@ -127,24 +127,26 @@ const AppHome: React.FC = () => {
               <CardTitle>Experiment Complete!</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-base mb-2">
-                <b>Your results:</b>
-              </div>
+              {/* Casual persona result + histogram graphs */}
               {clusterGroup !== null && (
-                <div className="mb-4 flex flex-col gap-2">
-                  <div className="flex items-center gap-2 text-primary font-bold">
-                    Group: <span className="border px-2 py-0.5 rounded bg-muted text-base flex items-center gap-1">
-                      {groupDetails[clusterGroup].emoji && (
-                        <span className="text-xl">{groupDetails[clusterGroup].emoji}</span>
-                      )}
-                      <span>{groupDetails[clusterGroup].name}</span>
-                    </span>
-                  </div>
-                  <div className="text-gray-700 px-2 italic" style={{fontSize: "1em"}}>
-                    {groupDetails[clusterGroup].description}
-                  </div>
-                </div>
+                <ResultSummary
+                  group={clusterGroup}
+                  correctRate={
+                    results.length > 0
+                      ? results.filter((r) => r.estimate !== null && Math.abs((r.estimate ?? 0) - r.numBlocks) <= 1).length / results.length
+                      : 0
+                  }
+                  avgSpeed={
+                    results.length > 0
+                      ? results.filter((r) => typeof r.duration === "number").reduce((s, r) => s + r.duration, 0) / results.length
+                      : 0
+                  }
+                />
               )}
+
+              <div className="text-base mb-2 font-semibold">
+                Your trial data:
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full border">
                   <thead>
