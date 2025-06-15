@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +33,8 @@ const yearsOpts = [
   "more than 20"
 ];
 
+const ZAPIER_WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/23386005/uyvi4ck/";
+
 const Questionnaire: React.FC<Props> = ({ onComplete }) => {
   const [form, setForm] = useState<Partial<QuestionnaireData>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -45,7 +46,34 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     setForm(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendToZapier = async (data: QuestionnaireData) => {
+    try {
+      await fetch(ZAPIER_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        mode: "no-cors",
+        body: JSON.stringify({
+          ...data,
+          submitted_at: new Date().toISOString(),
+          page_url: window.location.href
+        })
+      });
+      toast({
+        title: "Survey Submitted!",
+        description: "Your responses were sent to the researcher successfully.",
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Failed to send data to researcher.",
+        description: "Your answers could not be sent to Google Sheets.",
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       !(form.ageGroup && form.country && form.yearsInCountry && form.language && form.mediaType && form.mediaKind && form.mediaHours)
@@ -54,6 +82,10 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
       return;
     }
     setSubmitting(true);
+
+    // Send data to Zapier (Google Sheets)
+    await sendToZapier(form as QuestionnaireData);
+
     setTimeout(() => {
       setSubmitting(false);
       onComplete(form as QuestionnaireData);
