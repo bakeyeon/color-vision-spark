@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { assignClusterGroup, ClusterGroup } from "@/lib/userCluster";
 import ResultSummary from "@/components/ResultSummary";
+import { Share } from "lucide-react";
 
 // Marine group names and descriptions
 const groupDetails: Record<
@@ -57,8 +58,8 @@ const groupDetails: Record<
 };
 
 const AppHome: React.FC = () => {
-  // Reordered phases: intro -> experiment -> questionnaire -> summary -> done
-  const [phase, setPhase] = useState<"intro" | "experiment" | "questionnaire" | "summary" | "done">("intro");
+  // Phases: intro -> experiment -> questionnaire -> summary
+  const [phase, setPhase] = useState<"intro" | "experiment" | "questionnaire" | "summary">("intro");
   const [results, setResults] = useState<TrialResult[]>([]);
   const [demographics, setDemographics] = useState<QuestionnaireData | null>(null);
 
@@ -76,11 +77,26 @@ const AppHome: React.FC = () => {
     setPhase("summary");
   };
 
-  // Assign cluster only when summary is shown and results exist
   const clusterGroup: ClusterGroup | null =
     phase === "summary" && results.length > 0
       ? assignClusterGroup({ results })
       : null;
+
+  // Share functionality, using Web Share API if available, fallback to copying URL
+  const handleShare = () => {
+    const shareUrl = window.location.origin + "/";
+    const shareText = "Discover your own colorfish! Try this Colorfish Test:";
+    if (navigator.share) {
+      navigator.share({
+        title: "Colorfish Test",
+        text: shareText,
+        url: shareUrl,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      alert("Link copied to clipboard!");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
@@ -88,9 +104,7 @@ const AppHome: React.FC = () => {
         <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif">
           Colorfish Test
         </h1>
-        <p className="text-lg text-blue-500 max-w-2xl mb-2">
-          Test your ability to detect subtle color transitions.
-        </p>
+        {/* Removed "Test your ability to detect subtle color transitions." */}
       </header>
 
       <main className="flex flex-col items-center w-full">
@@ -130,6 +144,9 @@ const AppHome: React.FC = () => {
                   Some trials use <span className="text-blue-400/70">subtle gradients</span>; others use sharper divisions.
                 </li>
               </ul>
+              <div className="mb-2 text-blue-900">
+                Thank you for participating the test, I hope you'd enjoy it!
+              </div>
               <div className="mb-4 text-blue-900">Click <span className="px-2 py-1 bg-blue-100 rounded font-medium">Start</span> when you're ready. There is no time limit, and your response time will be recorded.</div>
               <hr className="my-4 border-blue-200" />
               <div className="text-xs text-center text-blue-500 leading-snug">
@@ -152,7 +169,6 @@ const AppHome: React.FC = () => {
           <ExperimentPanel onComplete={handleExperimentComplete} />
         )}
 
-        {/* Questionnaire is now right after experiment */}
         {phase === "questionnaire" && (
           <Questionnaire onComplete={handleQuestionnaire} />
         )}
@@ -164,6 +180,18 @@ const AppHome: React.FC = () => {
               <CardTitle>Experiment Complete!</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Share button */}
+              <div className="flex justify-end mb-4">
+                <Button
+                  variant="outline"
+                  onClick={handleShare}
+                  className="gap-2"
+                  aria-label="Share this test"
+                >
+                  <Share className="inline-block" />
+                  Share this test with friends
+                </Button>
+              </div>
               {/* Casual persona result + histogram graphs */}
               {clusterGroup !== null && (
                 <ResultSummary
@@ -211,27 +239,7 @@ const AppHome: React.FC = () => {
                 </table>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button onClick={() => setPhase("done")}>
-                Finish
-              </Button>
-            </CardFooter>
-          </Card>
-        )}
-
-        {/* Thank you message is now at the very end */}
-        {phase === "done" && (
-          <Card className="max-w-lg w-full mx-auto my-20 text-center">
-            <CardHeader>
-              <CardTitle>Thank you for participating!</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-2">Your input is invaluable for color perception research.</div>
-              <div className="text-muted-foreground text-xs">
-                The experiment data exists only in your browser for privacy.<br />
-                Want to try again? Reload the page.
-              </div>
-            </CardContent>
+            {/* No footer button: user just sees results and can reload for retry */}
           </Card>
         )}
       </main>
@@ -242,3 +250,4 @@ const AppHome: React.FC = () => {
 export default AppHome;
 
 // NOTE TO USER: This file is now 235+ lines. Please consider asking to refactor into multiple smaller components for maintainability.
+
