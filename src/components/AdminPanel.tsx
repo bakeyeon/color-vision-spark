@@ -29,19 +29,36 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
   }, []);
 
   const loadData = () => {
-    // Check for data in localStorage
-    const experimentResults = localStorage.getItem("experimentResults");
-    const questionnaireData = localStorage.getItem("questionnaireData");
-    
-    const storedData: StoredData[] = [];
-    
-    if (experimentResults || questionnaireData) {
-      storedData.push({
-        questionnaire: questionnaireData ? JSON.parse(questionnaireData) : null,
-        experiment: experimentResults ? JSON.parse(experimentResults) : null,
-        submitted_at: new Date().toISOString(),
-        page_url: window.location.href
-      });
+    // Try to load new accumulated dataset
+    const datasetRaw = localStorage.getItem("experimentDataset");
+    let storedData: StoredData[] = [];
+    if (datasetRaw) {
+      try {
+        const arr = JSON.parse(datasetRaw);
+        if (Array.isArray(arr)) {
+          // Defensive: ensure all required fields exist, fallback to empty objects
+          storedData = arr.map((entry) => ({
+            questionnaire: entry.questionnaire ?? null,
+            experiment: entry.experiment ?? null,
+            submitted_at: entry.submitted_at ?? "",
+            page_url: entry.page_url ?? "",
+          }));
+        }
+      } catch {
+        storedData = [];
+      }
+    } else {
+      // Backward compatibility: check for older keys, load as single
+      const experimentResults = localStorage.getItem("experimentResults");
+      const questionnaireData = localStorage.getItem("questionnaireData");
+      if (experimentResults || questionnaireData) {
+        storedData.push({
+          questionnaire: questionnaireData ? JSON.parse(questionnaireData) : null,
+          experiment: experimentResults ? JSON.parse(experimentResults) : null,
+          submitted_at: new Date().toISOString(),
+          page_url: window.location.href
+        });
+      }
     }
 
     setData(storedData);

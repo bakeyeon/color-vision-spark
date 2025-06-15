@@ -96,8 +96,30 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     }
     setSubmitting(true);
 
-    // Always save data locally for admin access
-    localStorage.setItem("questionnaireData", JSON.stringify(form));
+    // Combine questionnaire with experiment data, accumulate in array
+    const storedResults = localStorage.getItem("experimentResults");
+    const experimentResults: TrialResult[] | null = storedResults ? JSON.parse(storedResults) : null;
+
+    const dataToSave = {
+      questionnaire: form,
+      experiment: experimentResults,
+      submitted_at: new Date().toISOString(),
+      page_url: window.location.href
+    };
+
+    // Load the existing dataset array (or create a new one)
+    const datasetRaw = localStorage.getItem("experimentDataset");
+    let dataset: any[] = [];
+    if (datasetRaw) {
+      try {
+        dataset = JSON.parse(datasetRaw);
+        if (!Array.isArray(dataset)) dataset = [];
+      } catch {
+        dataset = [];
+      }
+    }
+    dataset.push(dataToSave);
+    localStorage.setItem("experimentDataset", JSON.stringify(dataset));
 
     try {
       // Try to send data to Zapier (Google Sheets)
@@ -105,10 +127,11 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
 
       setTimeout(() => {
         setSubmitting(false);
+
+        // Clean up individual keys for future compatibility? (Optional: keep for now)
         onComplete(form as QuestionnaireData);
       }, 400);
     } catch (error) {
-      // Even if Zapier fails, we still have the data saved locally
       toast({
         title: "Data Saved Locally",
         description: "Your responses are saved and can be accessed by the researcher.",
