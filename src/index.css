@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -107,24 +108,8 @@
   min-height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: url("/lovable-uploads/e44668cb-4181-4428-b872-8a64de8c91e1.png") center center no-repeat;
+  background: url("/lovable-uploads/e8c5e610-0013-454e-9112-31da48f12f3b.png") center center no-repeat;
   background-size: cover;
   position: relative;
 }
 /* --- END Custom Pixel Ocean Background --- */
-
-/* --- BEGIN Mock PNG ocean background --- */
-.cute-ocean-bg {
-  min-height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background: url("/bg.png") center center no-repeat;
-  background-size: cover;
-  position: relative;
-}
-/* If you want to re-enable the coral corners, restore them later! */
-/* .coral-corner,
-.coral-corner.right {
-  display: none;
-} */
-/* --- END Mock PNG ocean background --- */

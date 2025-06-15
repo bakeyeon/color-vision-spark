@@ -301,7 +301,7 @@ const AppHome: React.FC = () => {
           <Card className="max-w-2xl w-full mx-auto border-2 shadow-xl bg-white/90 backdrop-blur-sm ring-1 ring-blue-300">
             <CardHeader>
               <CardTitle className="text-center">
-                🐟 <span className="text-blue-700 drop-shadow">What kind of fish are you?</span>
+                <span className="text-blue-700 drop-shadow">What kind of fish are you?</span>
               </CardTitle>
             </CardHeader>
             {/* Intro text area setup */}
