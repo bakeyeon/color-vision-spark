@@ -235,7 +235,7 @@ const AppHome: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
-        <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif">
+        <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif font-cute">
           Colorfish Test
         </h1>
         {/* Removed subtitle */}
