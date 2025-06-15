@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
@@ -93,23 +94,40 @@ const AppHome: React.FC = () => {
           <Card className="max-w-2xl w-full mx-auto border-2 shadow-lg">
             <CardHeader>
               <CardTitle>
-                Visual Perception Research Task
+                🐟 What kind of fish are you?
               </CardTitle>
             </CardHeader>
             <CardContent className="text-base text-muted-foreground">
+              <div className="italic text-primary mb-2">"Among fish that react to colors, what kind of visual-linguistic sense are you?"</div>
+              <p className="mb-3">
+                The way we see colors varies from person to person.
+                <br /><br />
+                Some people immediately distinguish between sky blue and mint, and others say, "What's the difference?"
+                <br /><br />
+                Like fish swimming in the ocean, our senses also read the world in different patterns.
+                <br />
+                <span className="font-semibold">What kind of color sense are you?</span>
+              </p>
               <ul className="list-disc ml-5 mb-2">
-                <li>Each trial shows a color gradient bar made of <b>8–30 adjacent blocks</b>, always aligned smoothly.</li>
                 <li>
-                  <b>Your task</b>: Count how many perceptually distinct color segments (visible divisions) you can see in the bar—even if the colors are very similar!
+                  You'll be shown a color gradient bar made of <b>8–30 adjacent blocks</b> per trial, always smoothly aligned.
                 </li>
                 <li>
-                  Colors will always move smoothly from <span className="font-medium text-blue-700">white</span> → <span className="font-medium text-blue-400">light blue</span> → <span className="font-medium text-blue-800">dark blue</span> → <span className="font-medium text-cyan-600">cyan</span> → <span className="font-medium text-green-700">green</span>.
+                  <b>Your task:</b> Count how many perceptually distinct color segments (visible divisions) you can spot—even if the colors seem very similar!
                 </li>
                 <li>
-                  Some trials use <span className="text-muted-foreground">subtle gradients</span>; others use sharp divisions.
+                  Colors always move smoothly from <span className="font-medium text-blue-700">white</span> → <span className="font-medium text-blue-400">light blue</span> → <span className="font-medium text-blue-800">dark blue</span> → <span className="font-medium text-cyan-600">cyan</span> → <span className="font-medium text-green-700">green</span>.
+                </li>
+                <li>
+                  Some trials use <span className="text-muted-foreground">subtle gradients</span>; others use sharper divisions.
                 </li>
               </ul>
-              <div className="mb-4">Click "Start" when ready. There is no time limit, but your response time will be recorded.</div>
+              <div className="mb-4">Click "Start" when you're ready. There is no time limit, and your response time will be recorded.</div>
+              <hr className="my-4" />
+              <div className="text-xs text-center text-muted-foreground leading-snug">
+                * Your participation is voluntary and all data collected will be used for research purposes only.<br />
+                If you have any questions, please contact <a href="mailto:hyeyeon.park@hhu.de" className="underline">hyeyeon.park@hhu.de</a>.
+              </div>
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
               <Button onClick={start}>Start Experiment</Button>
