@@ -2,6 +2,17 @@ import React from "react";
 import SummaryChart from "./SummaryChart";
 import { ClusterGroup } from "@/lib/userCluster";
 
+// Mapping group number to the user-uploaded images
+const groupImages: Record<ClusterGroup, { src: string; alt: string }> = {
+  1: { src: "/lovable-uploads/8910f02a-ea52-4f93-880a-6bba100b2626.png", alt: "Blue Marlin" },
+  2: { src: "/lovable-uploads/c73cc6b7-f2b1-444b-90d2-e19d03655813.png", alt: "Pufferfish" },
+  3: { src: "/lovable-uploads/ab295de2-63a8-444d-87e5-96410d56fa97.png", alt: "Mandarinfish" },
+  4: { src: "/lovable-uploads/b1500335-6f2d-4627-b324-094a8502085e.png", alt: "Loach" },
+  5: { src: "/lovable-uploads/c03250c9-2e13-4365-b424-ebdb218f9817.png", alt: "Squid" },
+  6: { src: "/lovable-uploads/75d9f402-7c5d-4783-b206-fc671a76ab44.png", alt: "Flatfish" },
+  7: { src: "/lovable-uploads/f8a1fbc9-bf16-4731-9e44-e6f1eb2776fb.png", alt: "Mola mola" },
+};
+
 interface TrialResult {
   estimate: number | null;
   numBlocks: number;
@@ -122,9 +133,23 @@ const ResultSummary: React.FC<ResultSummaryProps> = ({
       : makeHistogramData(avgSpeed, 6, 1, 15);
 
   const persona = groupPersonas[group];
+  const fishImage = groupImages[group];
 
   return (
     <div className="flex flex-col items-center gap-2 mb-8">
+      {/* Fish image for this group */}
+      <div className="flex justify-center items-center mb-2">
+        {fishImage?.src ? (
+          <img
+            src={fishImage.src}
+            alt={fishImage.alt}
+            className="w-48 h-48 object-contain rounded-xl shadow-lg border bg-white"
+            style={{ background: "linear-gradient(180deg, #a5e4ff 0%, #fafeff 100%)" }}
+          />
+        ) : (
+          <span className="text-7xl">{persona.emoji}</span>
+        )}
+      </div>
       <div className="mb-2 text-center">
         <div className="text-3xl md:text-4xl font-bold mb-1">
           {persona.title}
