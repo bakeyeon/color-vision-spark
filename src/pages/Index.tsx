@@ -230,8 +230,44 @@ const AppHome: React.FC = () => {
                   </tbody>
                 </table>
               </div>
-              {/* Share button at the very bottom */}
-              <div className="flex justify-end mt-4">
+
+              {/* FISH COMPARISON SECTION */}
+              <div className="mb-8 flex flex-col items-center w-full">
+                <div className="text-lg font-semibold mb-4 text-center">
+                  Which fish are closest to me?
+                </div>
+                <div className="w-full flex flex-col md:flex-row gap-4 justify-center items-stretch">
+                  {/* Mola mola */}
+                  <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col items-center shadow-sm">
+                    {/* Placeholder for image */}
+                    <div className="w-24 h-24 mb-2 rounded-full bg-gray-200 flex items-center justify-center text-5xl">
+                      {/* Replace with <img /> when asset ready */}
+                      <span className="text-4xl" role="img" aria-label="Mola Mola">🐡</span>
+                    </div>
+                    <div className="font-bold text-blue-800 text-base mb-1">mola mola</div>
+                    <div className="text-sm text-gray-700 text-center">
+                      A delicate marine artist with intuitive judgment and sharp standards.<br/>
+                      Sometimes skips answers with&nbsp;<span className="font-semibold">unique sense 💎</span>
+                    </div>
+                  </div>
+                  {/* Flatfish */}
+                  <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col items-center shadow-sm">
+                    {/* Placeholder for image */}
+                    <div className="w-24 h-24 mb-2 rounded-full bg-gray-200 flex items-center justify-center text-5xl">
+                      {/* Replace with <img /> when asset ready */}
+                      <span className="text-4xl" role="img" aria-label="Flatfish">🦦</span>
+                    </div>
+                    <div className="font-bold text-blue-800 text-base mb-1">flatfish</div>
+                    <div className="text-sm text-gray-700 text-center">
+                      Slow responder, more interested in context than color.<br/>
+                      Reads between the lines and trusts analysis, not just sight!
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Centered share button */}
+              <div className="flex justify-center mt-4">
                 <Button
                   variant="outline"
                   onClick={handleShare}
@@ -253,5 +289,5 @@ const AppHome: React.FC = () => {
 
 export default AppHome;
 
-// NOTE TO USER: This file is now 235+ lines. Please consider asking to refactor into multiple smaller components for maintainability.
+// NOTE TO USER: This file is now over 260 lines. Please consider asking to refactor into multiple smaller components for maintainability.
 
