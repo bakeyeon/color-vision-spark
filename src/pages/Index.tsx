@@ -1,9 +1,59 @@
+
 import React, { useState } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { assignClusterGroup, ClusterGroup } from "@/lib/userCluster";
+
+// Marine group names and descriptions
+const groupDetails: Record<
+  ClusterGroup,
+  { name: string; description: string; emoji?: string }
+> = {
+  1: {
+    name: "Blue Marlin",
+    description:
+      "Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes. “Color calls me!”",
+    emoji: "🐟"
+  },
+  2: {
+    name: "Pufferfish",
+    description:
+      "Round, slow to color differences but stable - “Whether it’s mint or Tiffany, pretty things are pretty anyway~”",
+    emoji: "🐡"
+  },
+  3: {
+    name: "Mandarinfish",
+    description:
+      "Extreme color enthusiast. Rich in language sense - “This is… a little more cobalt.” Can distinguish even subtle differences!",
+    emoji: "🐠"
+  },
+  4: {
+    name: "Loach",
+    description:
+      "Text-centric brain, insensitive to color - “More interested in sentence structure than color.”",
+    emoji: "🦠"
+  },
+  5: {
+    name: "Squid",
+    description:
+      "Weak in color recognition but rich in imagination - “This color… resembles my mood.” Owner of poetic sensibility!",
+    emoji: "🦑"
+  },
+  6: {
+    name: "Flatfish",
+    description:
+      "Slow in response, focused on context rather than color - “I see color… but is that important?” Avoidant interpreter!",
+    emoji: "🦦"
+  },
+  7: {
+    name: "Mola mola",
+    description:
+      'A user who skipped more than half the questions - "I don\'t like the question..." A delicate boss surprisingly weak to stress despite the highest weight class in the ocean!',
+    emoji: "🐡"
+  }
+};
 
 const AppHome: React.FC = () => {
   const [phase, setPhase] = useState<"intro" | "experiment" | "summary" | "questionnaire" | "done">("intro");
@@ -81,13 +131,18 @@ const AppHome: React.FC = () => {
                 <b>Your results:</b>
               </div>
               {clusterGroup !== null && (
-                <div className="mb-3 flex items-center gap-2 text-primary font-bold">
-                  Your Group:{" "}
-                  <span className="border px-2 py-0.5 rounded bg-muted">
-                    {clusterGroup === 7
-                      ? "Unresponsive (no answer on most trials)"
-                      : `Cluster ${clusterGroup}`}
-                  </span>
+                <div className="mb-4 flex flex-col gap-2">
+                  <div className="flex items-center gap-2 text-primary font-bold">
+                    Group: <span className="border px-2 py-0.5 rounded bg-muted text-base flex items-center gap-1">
+                      {groupDetails[clusterGroup].emoji && (
+                        <span className="text-xl">{groupDetails[clusterGroup].emoji}</span>
+                      )}
+                      <span>{groupDetails[clusterGroup].name}</span>
+                    </span>
+                  </div>
+                  <div className="text-gray-700 px-2 italic" style={{fontSize: "1em"}}>
+                    {groupDetails[clusterGroup].description}
+                  </div>
                 </div>
               )}
               <div className="overflow-x-auto">
@@ -107,7 +162,7 @@ const AppHome: React.FC = () => {
                       <tr key={i} className="odd:bg-background even:bg-muted/50">
                         <td className="px-2 py-1">{i + 1}</td>
                         <td className="px-2 py-1">▇</td>
-                        <td className="px-2 py-1">{res.subtle ? 'Subtle' : 'Distinct'}</td>
+                        <td className="px-2 py-1">{res.subtle ? "Subtle" : "Distinct"}</td>
                         <td className="px-2 py-1 font-bold">{res.estimate}</td>
                         <td className="px-2 py-1">{res.numBlocks}</td>
                         <td className="px-2 py-1">{res.duration.toFixed(1)}</td>
