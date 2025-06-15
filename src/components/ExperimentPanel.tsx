@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import GradientBar from "./GradientBar";
 import { Button } from "@/components/ui/button";
@@ -182,9 +181,11 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
             Submit
           </Button>
         </form>
+        {/* Timer is now hidden per user request:
         <div className="text-xs text-muted-foreground">
           <span>Time: {elapsed.toFixed(1)} sec</span>
         </div>
+        */}
       </CardFooter>
     </Card>
   );
