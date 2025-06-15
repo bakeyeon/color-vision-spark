@@ -10,7 +10,10 @@ const groupImages: Record<ClusterGroup, { src: string; alt: string }> = {
   4: { src: "/lovable-uploads/184ba6d8-cbf9-434b-9374-5bd1c0001df8.png", alt: "Loach_loach_new" },
   5: { src: "/lovable-uploads/b5fc1cf1-a91f-4992-89de-79c80c55167e.png", alt: "Squid_squid_new" },
   6: { src: "/lovable-uploads/5664d52d-85f7-4eea-ae8c-bac7cc6026f4.png", alt: "Flatfish_flatfish_new" },
-  7: { src: "/lovable-uploads/23c0dc77-72e1-4330-a98a-18e6c0840a0f.png", alt: "Mola mola_molamola_new" },
+  7: {
+    src: "/lovable-uploads/094aa926-7fee-4286-85bc-260fb6876561.png",
+    alt: "Mola mola_molamola_new (user uploaded)"
+  },
 };
 
 interface TrialResult {
