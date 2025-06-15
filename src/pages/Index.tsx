@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
@@ -56,19 +57,23 @@ const groupDetails: Record<
 };
 
 const AppHome: React.FC = () => {
-  const [phase, setPhase] = useState<"intro" | "experiment" | "summary" | "questionnaire" | "done">("intro");
+  // Reordered phases: intro -> experiment -> questionnaire -> summary -> done
+  const [phase, setPhase] = useState<"intro" | "experiment" | "questionnaire" | "summary" | "done">("intro");
   const [results, setResults] = useState<TrialResult[]>([]);
   const [demographics, setDemographics] = useState<QuestionnaireData | null>(null);
 
   const start = () => setPhase("experiment");
 
+  // After experiment, go directly to questionnaire
   const handleExperimentComplete = (res: TrialResult[]) => {
     setResults(res);
-    setPhase("summary");
+    setPhase("questionnaire");
   };
+
+  // After questionnaire, go to summary screen with persona/result
   const handleQuestionnaire = (d: QuestionnaireData) => {
     setDemographics(d);
-    setPhase("done");
+    setPhase("summary");
   };
 
   // Assign cluster only when summary is shown and results exist
@@ -147,6 +152,12 @@ const AppHome: React.FC = () => {
           <ExperimentPanel onComplete={handleExperimentComplete} />
         )}
 
+        {/* Questionnaire is now right after experiment */}
+        {phase === "questionnaire" && (
+          <Questionnaire onComplete={handleQuestionnaire} />
+        )}
+
+        {/* Result/persona summary is after questionnaire */}
         {phase === "summary" && (
           <Card className="max-w-3xl w-full mx-auto shadow-lg border-2 mt-10">
             <CardHeader>
@@ -201,17 +212,14 @@ const AppHome: React.FC = () => {
               </div>
             </CardContent>
             <CardFooter className="flex justify-end">
-              <Button onClick={() => setPhase("questionnaire")}>
-                Continue to Final Questions
+              <Button onClick={() => setPhase("done")}>
+                Finish
               </Button>
             </CardFooter>
           </Card>
         )}
 
-        {phase === "questionnaire" && (
-          <Questionnaire onComplete={handleQuestionnaire} />
-        )}
-
+        {/* Thank you message is now at the very end */}
         {phase === "done" && (
           <Card className="max-w-lg w-full mx-auto my-20 text-center">
             <CardHeader>
@@ -232,3 +240,5 @@ const AppHome: React.FC = () => {
 };
 
 export default AppHome;
+
+// NOTE TO USER: This file is now 235+ lines. Please consider asking to refactor into multiple smaller components for maintainability.
