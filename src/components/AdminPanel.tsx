@@ -8,6 +8,7 @@ import { LogOut, Download, FileText, Users, TrendingUp, Fish } from "lucide-reac
 import { type TrialResult } from "./ExperimentPanel";
 import { type QuestionnaireData } from "./Questionnaire";
 import PasswordChangeDialog from "./PasswordChangeDialog";
+import ParticipantCard from "./ParticipantCard";
 
 interface StoredData {
   questionnaire: QuestionnaireData | null;
@@ -316,6 +317,20 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
 
   const overviewStats = getOverviewStats();
 
+  // Delete participant data logic  
+  const handleDeleteParticipant = (index: number) => {
+    const updatedData = [...data];
+    updatedData.splice(index, 1);
+    setData(updatedData);
+    // Update localStorage
+    localStorage.setItem("experimentDataset", JSON.stringify(updatedData));
+    toast({
+      title: "Participant Deleted",
+      description: `Participant ${index + 1} data has been deleted.`,
+      variant: "destructive"
+    });
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -427,57 +442,12 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
           <TabsContent value="data">
             <div className="space-y-6">
               {data.map((entry, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <CardTitle>Participant {index + 1}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {entry.questionnaire && (
-                      <div className="mb-4">
-                        <h3 className="font-semibold mb-2">Questionnaire Data:</h3>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div><strong>Age Group:</strong> {entry.questionnaire.ageGroup}</div>
-                          <div><strong>Country:</strong> {entry.questionnaire.country}</div>
-                          <div><strong>Years in Country:</strong> {entry.questionnaire.yearsInCountry}</div>
-                          <div><strong>Language:</strong> {entry.questionnaire.language}</div>
-                          <div><strong>Media Type:</strong> {entry.questionnaire.mediaType}</div>
-                          <div><strong>Media Kind:</strong> {entry.questionnaire.mediaKind}</div>
-                          <div><strong>Media Hours:</strong> {entry.questionnaire.mediaHours}</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {entry.experiment && (
-                      <div>
-                        <h3 className="font-semibold mb-2">Experiment Results ({entry.experiment.length} trials):</h3>
-                        <div className="overflow-x-auto">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>Trial</TableHead>
-                                <TableHead>Estimate</TableHead>
-                                <TableHead>Actual</TableHead>
-                                <TableHead>Duration (s)</TableHead>
-                                <TableHead>Level</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {entry.experiment.map((trial, i) => (
-                                <TableRow key={i}>
-                                  <TableCell>{i + 1}</TableCell>
-                                  <TableCell>{trial.estimate}</TableCell>
-                                  <TableCell>{trial.numBlocks}</TableCell>
-                                  <TableCell>{trial.duration.toFixed(1)}</TableCell>
-                                  <TableCell>{trial.level}</TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <ParticipantCard 
+                  key={index}
+                  entry={entry}
+                  index={index}
+                  onDelete={() => handleDeleteParticipant(index)}
+                />
               ))}
             </div>
           </TabsContent>
