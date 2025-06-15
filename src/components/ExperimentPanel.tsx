@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import GradientBar from "./GradientBar";
 import { Button } from "@/components/ui/button";
@@ -8,8 +9,6 @@ import { toast } from "@/hooks/use-toast";
 interface TrialResult {
   trial: number;
   numBlocks: number;
-  orientation: "horizontal" | "vertical";
-  subtle: boolean;
   start: number;
   end: number;
   estimate: number | null;
@@ -22,9 +21,6 @@ const MAX_BLOCKS = 30;
 
 function randomInt(min: number, max: number) {
   return min + Math.floor(Math.random() * (max - min + 1));
-}
-function randomOrientation(): "horizontal" | "vertical" {
-  return Math.random() > 0.5 ? "horizontal" : "vertical";
 }
 
 function randomSubtlety(): boolean {
@@ -43,7 +39,7 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
   const [timerOn, setTimerOn] = useState(false);
   const [trialStart, setTrialStart] = useState<number | null>(null);
 
-  // Define all trial config up front to ensure "fair" randomization
+  // Define all trial config up front (horizontal only)
   const trials = React.useMemo(() => {
     return Array.from({ length: TRIALS_COUNT }).map((_, i) => {
       const subtle = randomSubtlety();
@@ -53,7 +49,6 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       return {
         trial: i + 1,
         numBlocks,
-        orientation: randomOrientation(),
         subtle,
       };
     });
@@ -139,9 +134,9 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       <CardContent className="flex flex-col items-center py-6">
         <GradientBar
           numBlocks={current.numBlocks}
-          orientation={current.orientation}
-          blockSize={34}
+          subtle={current.subtle}
           className={current.subtle ? "border-none shadow-none" : ""}
+          totalWidth={600}
         />
         {!current.subtle ? (
           <div className="absolute mt-[-2.9rem] w-full flex pointer-events-none select-none">
@@ -150,11 +145,8 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
                 key={idx}
                 className="border-r border-white/30"
                 style={{
-                  height: current.orientation === "horizontal" ? 36 : "100%",
-                  width: current.orientation === "horizontal" ? "1px" : "100%",
-                  ...(current.orientation === "vertical"
-                    ? { width: 34, height: "1px", borderBottom: "1px solid rgba(255,255,255,0.30)", borderRight: "none" }
-                    : {}),
+                  height: 36,
+                  width: "1px",
                 }}
               />
             ))}
@@ -181,11 +173,7 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
             Submit
           </Button>
         </form>
-        {/* Timer is now hidden per user request:
-        <div className="text-xs text-muted-foreground">
-          <span>Time: {elapsed.toFixed(1)} sec</span>
-        </div>
-        */}
+        {/* Timer is now hidden per user request */}
       </CardFooter>
     </Card>
   );
@@ -193,3 +181,4 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
 
 export type { TrialResult };
 export default ExperimentPanel;
+
