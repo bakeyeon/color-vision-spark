@@ -304,7 +304,8 @@ const AppHome: React.FC = () => {
                 🐟 <span className="text-blue-700 drop-shadow">What kind of fish are you?</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-base text-blue-700">
+            {/* Center align all text in CardContent */}
+            <CardContent className="text-base text-blue-700 text-center">
               <div className="italic text-blue-600 mb-2">"Among fish that react to colors, what kind of visual-linguistic sense are you?"</div>
               {/* Intro image now appears here, right after the italic text */}
               <img
@@ -321,7 +322,7 @@ const AppHome: React.FC = () => {
                 <br />
                 <span className="font-semibold text-blue-900">What kind of color sense are you?</span>
               </p>
-              <ul className="list-disc ml-5 mb-2 text-blue-700/90">
+              <ul className="list-disc ml-5 mb-2 text-blue-700/90 text-center list-inside">
                 <li>
                   You'll be shown a color gradient bar made of <b className="text-blue-900">8–30 adjacent blocks</b> per trial, always smoothly aligned.
                 </li>
