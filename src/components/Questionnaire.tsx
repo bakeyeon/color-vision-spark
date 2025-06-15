@@ -52,12 +52,11 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     const experimentResults: TrialResult[] | null = storedResults ? JSON.parse(storedResults) : null;
 
     try {
-      await fetch(ZAPIER_WEBHOOK_URL, {
+      const response = await fetch(ZAPIER_WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        mode: "no-cors", // Required for Zapier webhooks to avoid CORS issues
         body: JSON.stringify({
           questionnaire: data,
           experiment: experimentResults,
@@ -65,8 +64,13 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
           page_url: window.location.href
         })
       });
-      
-      // With no-cors mode, we can't read the response, so we assume success
+
+      // Check if the response is ok (status 200-299)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("Data successfully sent to Zapier");
       toast({
         title: "Survey Submitted!",
         description: "Your responses were sent to the researcher successfully.",
@@ -76,9 +80,9 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
       toast({
         variant: "destructive",
         title: "Failed to send data to researcher.",
-        description: "Your answers could not be sent. Please try again.",
+        description: "Please check your internet connection and try again.",
       });
-      throw err; // Re-throw to handle in calling function
+      throw err;
     }
   };
 
