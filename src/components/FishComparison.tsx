@@ -1,4 +1,3 @@
-
 import React from "react";
 import { groupImages } from "./ResultSummary";
 
@@ -8,17 +7,15 @@ type Fish = {
   emoji?: string;
   description: string;
   imageAlt?: string;
-  // Will use emoji as placeholder if no image is given.
-  src?: string; // Optionally include image src
+  src?: string;
 };
 
 interface FishComparisonProps {
   left: Fish | undefined;
   right: Fish | undefined;
-  mainFishId?: number; // Main/result fish group ID
+  mainFishId?: number;
 }
 
-// Defensive: display nothing or fallback content if fish is missing
 const FishComparison: React.FC<FishComparisonProps> = ({ left, right, mainFishId }) => {
   // Get image for mainFishId, if provided
   const mainFishImg = mainFishId && groupImages[mainFishId as keyof typeof groupImages];
@@ -55,10 +52,18 @@ const FishComparison: React.FC<FishComparisonProps> = ({ left, right, mainFishId
         {/* Left Fish */}
         <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col items-center shadow-sm">
           <div className="w-24 h-24 mb-2 rounded-full bg-gray-200 flex items-center justify-center text-5xl">
-            {left.emoji ? (
-              <span className="text-4xl" role="img" aria-label={left.name}>{left.emoji}</span>
+            {left.src ? (
+              <img
+                src={left.src}
+                alt={left.imageAlt || left.name}
+                className="w-24 h-24 object-contain rounded-full border-[6px] border-blue-400"
+                style={{
+                  background: "linear-gradient(180deg, #a5e4ff 0%, #fafeff 100%)",
+                  boxShadow: "0 0 0 6px #2772ed",
+                }}
+              />
             ) : (
-              <span className="text-4xl">🐟</span>
+              <span className="text-4xl" role="img" aria-label={left.name}>{left.emoji || "🐟"}</span>
             )}
           </div>
           <div className="font-bold text-blue-800 text-base mb-1">{left.name}</div>
@@ -67,10 +72,18 @@ const FishComparison: React.FC<FishComparisonProps> = ({ left, right, mainFishId
         {/* Right Fish */}
         <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col items-center shadow-sm">
           <div className="w-24 h-24 mb-2 rounded-full bg-gray-200 flex items-center justify-center text-5xl">
-            {right.emoji ? (
-              <span className="text-4xl" role="img" aria-label={right.name}>{right.emoji}</span>
+            {right.src ? (
+              <img
+                src={right.src}
+                alt={right.imageAlt || right.name}
+                className="w-24 h-24 object-contain rounded-full border-[6px] border-blue-400"
+                style={{
+                  background: "linear-gradient(180deg, #a5e4ff 0%, #fafeff 100%)",
+                  boxShadow: "0 0 0 6px #2772ed",
+                }}
+              />
             ) : (
-              <span className="text-4xl">🐟</span>
+              <span className="text-4xl" role="img" aria-label={right.name}>{right.emoji || "🐟"}</span>
             )}
           </div>
           <div className="font-bold text-blue-800 text-base mb-1">{right.name}</div>

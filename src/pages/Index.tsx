@@ -4,10 +4,72 @@ import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { assignClusterGroup, ClusterGroup } from "@/lib/userCluster";
-import ResultSummary from "@/components/ResultSummary";
+import ResultSummary, { groupImages } from "@/components/ResultSummary";
 import { Share } from "lucide-react";
 import FishComparison from "@/components/FishComparison";
-import { groupImages } from "@/components/ResultSummary";
+
+// Updated fish type to include images and alt
+type Fish = {
+  id: number;
+  name: string;
+  emoji: string;
+  description: string;
+  src?: string;
+  imageAlt?: string;
+};
+
+// Enhance fishList so each fish gets its src/alt from groupImages if available
+const fishList: Array<Fish> = [
+  {
+    id: 1,
+    name: "Blue Marlin",
+    emoji: "🐟",
+    description: "Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes.",
+    ...(groupImages[1] ? { src: groupImages[1].src, imageAlt: groupImages[1].alt } : {})
+  },
+  {
+    id: 2,
+    name: "Pufferfish",
+    emoji: "🐡",
+    description: "Round, slow to color differences but stable.",
+    ...(groupImages[2] ? { src: groupImages[2].src, imageAlt: groupImages[2].alt } : {})
+  },
+  {
+    id: 3,
+    name: "Mandarinfish",
+    emoji: "🐠",
+    description: "Extreme color enthusiast. Rich in language sense.",
+    ...(groupImages[3] ? { src: groupImages[3].src, imageAlt: groupImages[3].alt } : {})
+  },
+  {
+    id: 4,
+    name: "Loach",
+    emoji: "🦠",
+    description: "Text-centric brain, insensitive to color.",
+    ...(groupImages[4] ? { src: groupImages[4].src, imageAlt: groupImages[4].alt } : {})
+  },
+  {
+    id: 5,
+    name: "Squid",
+    emoji: "🦑",
+    description: "Weak in color recognition but rich in imagination.",
+    ...(groupImages[5] ? { src: groupImages[5].src, imageAlt: groupImages[5].alt } : {})
+  },
+  {
+    id: 6,
+    name: "Flatfish",
+    emoji: "🦦",
+    description: "Slow in response, focused on context rather than color.",
+    ...(groupImages[6] ? { src: groupImages[6].src, imageAlt: groupImages[6].alt } : {})
+  },
+  {
+    id: 7,
+    name: "Mola mola",
+    emoji: "🐡",
+    description: "a delicate boss surprisingly weak to stress despite the highest weight class in the ocean!",
+    ...(groupImages[7] ? { src: groupImages[7].src, imageAlt: groupImages[7].alt } : {})
+  }
+];
 
 // Marine group names and descriptions
 const groupDetails: Record<
@@ -57,16 +119,6 @@ const groupDetails: Record<
     emoji: "🐡"
   }
 };
-
-const fishList: Array<{ id: number; name: string; emoji: string; description: string }> = [
-  { id: 1, name: "Blue Marlin", emoji: "🐟", description: "Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes." },
-  { id: 2, name: "Pufferfish", emoji: "🐡", description: "Round, slow to color differences but stable." },
-  { id: 3, name: "Mandarinfish", emoji: "🐠", description: "Extreme color enthusiast. Rich in language sense." },
-  { id: 4, name: "Loach", emoji: "🦠", description: "Text-centric brain, insensitive to color." },
-  { id: 5, name: "Squid", emoji: "🦑", description: "Weak in color recognition but rich in imagination." },
-  { id: 6, name: "Flatfish", emoji: "🦦", description: "Slow in response, focused on context rather than color." },
-  { id: 7, name: "Mola mola", emoji: "🐡", description: "a delicate boss surprisingly weak to stress despite the highest weight class in the ocean!" }
-];
 
 // Utility: picks, given the user's main group, the next closest group deterministically, prioritizing 6 (flatfish) and 7 (mola mola) if not assigned
 function getClosestFish(userGroup: number): [typeof fishList[0], typeof fishList[0]] {
@@ -383,7 +435,7 @@ const AppHome: React.FC = () => {
                 </div>
               )}
 
-              {/* FishComparison, pass mainFishId */}
+              {/* FishComparison, pass mainFishId and new image fields */}
               {clusterGroup !== null && (
                 <FishComparison
                   left={getClosestOtherFish(clusterGroup)[0]}
