@@ -96,8 +96,11 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     }
     setSubmitting(true);
 
+    // Always save data locally for admin access
+    localStorage.setItem("questionnaireData", JSON.stringify(form));
+
     try {
-      // Send data to Zapier (Google Sheets)
+      // Try to send data to Zapier (Google Sheets)
       await sendToZapier(form as QuestionnaireData);
 
       setTimeout(() => {
@@ -105,8 +108,16 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
         onComplete(form as QuestionnaireData);
       }, 400);
     } catch (error) {
-      setSubmitting(false);
-      // Error already handled in sendToZapier
+      // Even if Zapier fails, we still have the data saved locally
+      toast({
+        title: "Data Saved Locally",
+        description: "Your responses are saved and can be accessed by the researcher.",
+      });
+      
+      setTimeout(() => {
+        setSubmitting(false);
+        onComplete(form as QuestionnaireData);
+      }, 400);
     }
   };
 

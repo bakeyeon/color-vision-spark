@@ -1,11 +1,14 @@
+
 import React, { useState, useMemo } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
+import AdminLogin from "@/components/AdminLogin";
+import AdminPanel from "@/components/AdminPanel";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { assignClusterGroup, ClusterGroup } from "@/lib/userCluster";
 import ResultSummary, { groupImages } from "@/components/ResultSummary";
-import { Share } from "lucide-react";
+import { Share, Shield } from "lucide-react";
 import FishComparison from "@/components/FishComparison";
 
 // Updated fish type to include images and alt
@@ -152,12 +155,15 @@ function getClosestFish(userGroup: number): [typeof fishList[0], typeof fishList
 }
 
 const AppHome: React.FC = () => {
-  // Phases: intro -> experiment -> questionnaire -> summary
-  const [phase, setPhase] = useState<"intro" | "experiment" | "questionnaire" | "summary">("intro");
+  // Phases: intro -> experiment -> questionnaire -> summary -> admin
+  const [phase, setPhase] = useState<"intro" | "experiment" | "questionnaire" | "summary" | "admin" | "admin-panel">("intro");
   const [results, setResults] = useState<TrialResult[]>([]);
   const [demographics, setDemographics] = useState<QuestionnaireData | null>(null);
 
   const [skipCount, setSkipCount] = useState(0);
+
+  // Check if admin is already logged in
+  const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
 
   // After experiment, go directly to questionnaire
   const handleExperimentComplete = (res: TrialResult[], skips: number) => {
@@ -225,6 +231,9 @@ const AppHome: React.FC = () => {
   };
 
   const start = () => setPhase("experiment");
+  const goToAdmin = () => setPhase("admin");
+  const handleAdminLogin = () => setPhase("admin-panel");
+  const handleAdminLogout = () => setPhase("intro");
 
   // New: state for table toggle
   const [showTrialData, setShowTrialData] = useState(false);
@@ -294,9 +303,28 @@ const AppHome: React.FC = () => {
         <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif font-cute">
           Colorfish Test
         </h1>
-        {/* Removed subtitle */}
+        {/* Admin button in header */}
+        {phase === "intro" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goToAdmin}
+            className="absolute top-4 right-4 text-blue-600 hover:text-blue-800"
+          >
+            <Shield className="w-4 h-4 mr-1" />
+            Admin
+          </Button>
+        )}
       </header>
       <main className="flex flex-col items-center w-full">
+        {phase === "admin" && (
+          <AdminLogin onLogin={handleAdminLogin} />
+        )}
+
+        {phase === "admin-panel" && (
+          <AdminPanel onLogout={handleAdminLogout} />
+        )}
+
         {phase === "intro" && (
           <Card className="max-w-2xl w-full mx-auto border-2 shadow-xl bg-white/90 backdrop-blur-sm ring-1 ring-blue-300">
             <CardHeader>
@@ -475,5 +503,3 @@ const AppHome: React.FC = () => {
 };
 
 export default AppHome;
-
-// NOTE TO USER: This file is very long and should be refactored into smaller components for better maintainability.
