@@ -1,9 +1,11 @@
+
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { type TrialResult } from "./ExperimentPanel";
 
 interface QuestionnaireData {
   ageGroup: string;
@@ -47,6 +49,9 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
   };
 
   const sendToZapier = async (data: QuestionnaireData) => {
+    const storedResults = localStorage.getItem("experimentResults");
+    const experimentResults: TrialResult[] | null = storedResults ? JSON.parse(storedResults) : null;
+
     try {
       await fetch(ZAPIER_WEBHOOK_URL, {
         method: "POST",
@@ -55,7 +60,8 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
         },
         mode: "no-cors",
         body: JSON.stringify({
-          ...data,
+          questionnaire: data,
+          experiment: experimentResults,
           submitted_at: new Date().toISOString(),
           page_url: window.location.href
         })

@@ -130,13 +130,15 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       colorEnd: tCfg.colorEnd, // Should always be [number, number, number]
     };
 
-    setAnswers((prev) => [...prev, result]);
+    const updatedAnswers = [...answers, result];
+    setAnswers(updatedAnswers);
 
     setTimeout(() => {
       if (trialIdx + 1 < trials.length) {
         setTrialIdx(trialIdx + 1);
       } else {
-        onComplete([...answers, result], skipCount);
+        localStorage.setItem("experimentResults", JSON.stringify(updatedAnswers));
+        onComplete(updatedAnswers, skipCount);
       }
     }, 400);
 
@@ -158,14 +160,17 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       colorEnd: tCfg.colorEnd,
     };
 
-    setAnswers((prev) => [...prev, result]);
-    setSkipCount((c) => c + 1);
+    const updatedAnswers = [...answers, result];
+    const newSkipCount = skipCount + 1;
+    setAnswers(updatedAnswers);
+    setSkipCount(newSkipCount);
 
     setTimeout(() => {
       if (trialIdx + 1 < trials.length) {
         setTrialIdx(trialIdx + 1);
       } else {
-        onComplete([...answers, result], skipCount + 1);
+        localStorage.setItem("experimentResults", JSON.stringify(updatedAnswers));
+        onComplete(updatedAnswers, newSkipCount);
       }
     }, 400);
 
