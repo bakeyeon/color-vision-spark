@@ -291,6 +291,15 @@ const AppHome: React.FC = () => {
       <div className="coral-corner" aria-hidden="true" />
       <div className="coral-corner right" aria-hidden="true" />
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
+        {/* --- ADD INTRO IMAGE ABOVE TITLE --- */}
+        {phase === "intro" && (
+          <img
+            src="/lovable-uploads/0caba236-82e1-45e5-a081-24f26810215c.png"
+            alt="Cute pixel art of a sunfish and a dog"
+            className="w-64 max-w-[90vw] h-auto mx-auto rounded-lg mb-3 drop-shadow-lg bg-white/80"
+            style={{ border: "4px solid #e2e8f0" }}
+          />
+        )}
         <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif font-cute">
           Colorfish Test
         </h1>
