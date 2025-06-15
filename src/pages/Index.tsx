@@ -64,7 +64,7 @@ const fishList: Array<{ id: number; name: string; emoji: string; description: st
   { id: 4, name: "Loach", emoji: "🦠", description: "Text-centric brain, insensitive to color." },
   { id: 5, name: "Squid", emoji: "🦑", description: "Weak in color recognition but rich in imagination." },
   { id: 6, name: "Flatfish", emoji: "🦦", description: "Slow in response, focused on context rather than color." },
-  { id: 7, name: "Mola mola", emoji: "🐡", description: "A user who skipped more than half the questions - a delicate boss surprisingly weak to stress despite the highest weight class in the ocean!" }
+  { id: 7, name: "Mola mola", emoji: "🐡", description: "a delicate boss surprisingly weak to stress despite the highest weight class in the ocean!" }
 ];
 
 // Utility: picks, given the user's main group, the next closest group deterministically, prioritizing 6 (flatfish) and 7 (mola mola) if not assigned
@@ -288,6 +288,7 @@ const AppHome: React.FC = () => {
                 </Button>
               </div>
               
+              {/* Only this table is toggled, charts/persona stay rendered */}
               {showTrialData && (
                 <div id="trial-data-table" className="overflow-x-auto mb-6 animate-fade-in">
                   <div className="text-base mb-2 font-semibold">
