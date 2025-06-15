@@ -304,9 +304,9 @@ const AppHome: React.FC = () => {
                 🐟 <span className="text-blue-700 drop-shadow">What kind of fish are you?</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-base text-blue-700 text-center bg-blue-50/90 rounded-md px-2 py-1">
+            {/* Intro text area setup */}
+            <CardContent className="text-base text-blue-700 text-center bg-white rounded-md px-2 py-1">
               <div className="italic text-blue-600 mb-2">"Among fish that react to colors, what kind of visual-linguistic sense are you?"</div>
-              {/* Intro image now appears here, right after the italic text */}
               <img
                 src="/lovable-uploads/0caba236-82e1-45e5-a081-24f26810215c.png"
                 alt="Cute pixel art of a sunfish and a dog"
@@ -329,7 +329,8 @@ const AppHome: React.FC = () => {
                   <b className="text-blue-900">Your task:</b> Count how many perceptually distinct color segments (visible divisions) you can spot—even if the colors seem very similar!
                 </li>
                 <li>
-                  Colors always move smoothly from <span className="font-medium text-blue-600">blue</span>
+                  Colors always move smoothly from{" "}
+                  <span className="font-medium text-blue-600">blue</span>
                   {" → "}
                   <span className="font-medium text-blue-400">pale blue</span>
                   {" → "}
@@ -337,7 +338,7 @@ const AppHome: React.FC = () => {
                   {" → "}
                   <span className="font-medium text-blue-800">dark blue</span>
                   {" → "}
-                  <span className="font-medium text-gray-100">white</span>.
+                  <span className="font-semibold text-blue-900">white</span>.
                 </li>
                 <li>
                   Some trials use <span className="text-blue-400/70">very subtle gradients</span>; others use sharper divisions—watch for both!
@@ -346,7 +347,9 @@ const AppHome: React.FC = () => {
               <div className="mb-2 text-blue-900">
                 Thank you for participating the test, I hope you'd enjoy it!
               </div>
-              <div className="mb-4 text-blue-900">Click <span className="px-2 py-1 bg-blue-100 rounded font-medium">Start</span> when you're ready. There is no time limit, and your response time will be recorded.</div>
+              <div className="mb-4 text-blue-900">
+                Click <span className="px-2 py-1 bg-blue-100 rounded font-medium">Start</span> when you're ready. There is no time limit, and your response time will be recorded.
+              </div>
               <hr className="my-4 border-blue-200" />
               <div className="text-xs text-center text-blue-500 leading-snug">
                 * Your participation is voluntary and all data collected will be used for research purposes only.<br />
