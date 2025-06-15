@@ -1,3 +1,4 @@
+
 import React from "react";
 import SummaryChart from "./SummaryChart";
 import { ClusterGroup } from "@/lib/userCluster";
@@ -21,9 +22,8 @@ interface TrialResult {
 }
 type ResultSummaryProps = {
   group: ClusterGroup;
-  correctRate: number; // as 0–1
-  avgSpeed: number; // secs
-  // Optional: precomputed chart data (to avoid randomization on re-render)
+  correctRate: number;
+  avgSpeed: number;
   corrData?: { bin: string; count: number }[];
   corrUserBin?: string;
   corrUserPercentile?: number;
@@ -143,8 +143,12 @@ const ResultSummary: React.FC<ResultSummaryProps> = ({
           <img
             src={fishImage.src}
             alt={fishImage.alt}
-            className="w-48 h-48 object-contain rounded-xl shadow-lg border bg-white"
-            style={{ background: "linear-gradient(180deg, #a5e4ff 0%, #fafeff 100%)" }}
+            className="w-52 h-52 object-contain rounded-xl shadow-lg border-[8px] border-white"
+            style={{
+              background: "linear-gradient(180deg, #a5e4ff 0%, #fafeff 100%)",
+              boxShadow: "0 0 0 20px #2772ed", // 20px thick blue border
+              borderColor: "#fff",
+            }}
           />
         ) : (
           <span className="text-7xl">{persona.emoji}</span>
@@ -158,7 +162,7 @@ const ResultSummary: React.FC<ResultSummaryProps> = ({
         <div className="text-base text-muted-foreground whitespace-pre-line mb-2">{persona.description}</div>
         <div className="italic text-gray-700">{persona.advice}</div>
       </div>
-      {/* Charts */}
+      {/* Vertical slider-style charts */}
       <SummaryChart
         title="Correct Answer Rate (%)"
         data={corr.data}
@@ -171,6 +175,7 @@ const ResultSummary: React.FC<ResultSummaryProps> = ({
                 "Plenty of room to show your true colors!"
         }
         color="#1f9cd1"
+        chartStyle="vertical-slider"
       />
       <SummaryChart
         title="Response Speed (s)"
@@ -183,9 +188,12 @@ const ResultSummary: React.FC<ResultSummaryProps> = ({
               "Taking your time isn't always bad!"
         }
         color="#7fdac3"
+        chartStyle="vertical-slider"
       />
     </div>
   );
 };
 
+export { groupImages }; // for use in FishComparison
 export default ResultSummary;
+

@@ -7,6 +7,7 @@ import { assignClusterGroup, ClusterGroup } from "@/lib/userCluster";
 import ResultSummary from "@/components/ResultSummary";
 import { Share } from "lucide-react";
 import FishComparison from "@/components/FishComparison";
+import { groupImages } from "@/components/ResultSummary";
 
 // Marine group names and descriptions
 const groupDetails: Record<
@@ -317,7 +318,7 @@ const AppHome: React.FC = () => {
         {phase === "summary" && (
           <Card className="max-w-3xl w-full mx-auto shadow-lg border-2 mt-10">
             <CardContent>
-              {/* Casual persona result + histogram graphs */}
+              {/* Persona result + vertical bar charts */}
               {clusterGroup !== null && memoizedHistogram && (
                 <ResultSummary
                   group={clusterGroup}
@@ -332,7 +333,7 @@ const AppHome: React.FC = () => {
                 />
               )}
 
-              {/* Button to show/hide trial data */}
+              {/* Button to toggle table */}
               <div className="my-4 flex justify-center">
                 <Button
                   variant="outline"
@@ -382,11 +383,12 @@ const AppHome: React.FC = () => {
                 </div>
               )}
 
-              {/* FishComparison */}
+              {/* FishComparison, pass mainFishId */}
               {clusterGroup !== null && (
                 <FishComparison
                   left={getClosestOtherFish(clusterGroup)[0]}
                   right={getClosestOtherFish(clusterGroup)[1]}
+                  mainFishId={clusterGroup}
                 />
               )}
 
