@@ -1,17 +1,16 @@
-
 import React from "react";
 import SummaryChart from "./SummaryChart";
 import { ClusterGroup } from "@/lib/userCluster";
 
-// Mapping group number to the user-uploaded images
+// Update: All fish images point to your uploaded files and titles include original filename + '_new'
 const groupImages: Record<ClusterGroup, { src: string; alt: string }> = {
-  1: { src: "/lovable-uploads/8910f02a-ea52-4f93-880a-6bba100b2626.png", alt: "Blue Marlin" },
-  2: { src: "/lovable-uploads/c73cc6b7-f2b1-444b-90d2-e19d03655813.png", alt: "Pufferfish" },
-  3: { src: "/lovable-uploads/ab295de2-63a8-444d-87e5-96410d56fa97.png", alt: "Mandarinfish" },
-  4: { src: "/lovable-uploads/b1500335-6f2d-4627-b324-094a8502085e.png", alt: "Loach" },
-  5: { src: "/lovable-uploads/c03250c9-2e13-4365-b424-ebdb218f9817.png", alt: "Squid" },
-  6: { src: "/lovable-uploads/75d9f402-7c5d-4783-b206-fc671a76ab44.png", alt: "Flatfish" },
-  7: { src: "/lovable-uploads/f8a1fbc9-bf16-4731-9e44-e6f1eb2776fb.png", alt: "Mola mola" },
+  1: { src: "/lovable-uploads/536357f8-45d2-42fa-a4af-2f196fe6502c.png", alt: "Blue Marlin_bluemarlin_new" },
+  2: { src: "/lovable-uploads/d14706b8-0490-4eba-8f5c-41e03631c302.png", alt: "Pufferfish_pufferfish_new" },
+  3: { src: "/lovable-uploads/42080f31-1dc3-46d3-83e8-de77bd06332e.png", alt: "Mandarinfish_mandarinfish_new" },
+  4: { src: "/lovable-uploads/184ba6d8-cbf9-434b-9374-5bd1c0001df8.png", alt: "Loach_loach_new" },
+  5: { src: "/lovable-uploads/b5fc1cf1-a91f-4992-89de-79c80c55167e.png", alt: "Squid_squid_new" },
+  6: { src: "/lovable-uploads/5664d52d-85f7-4eea-ae8c-bac7cc6026f4.png", alt: "Flatfish_flatfish_new" },
+  7: { src: "/lovable-uploads/23c0dc77-72e1-4330-a98a-18e6c0840a0f.png", alt: "Mola mola_molamola_new" },
 };
 
 interface TrialResult {
@@ -196,4 +195,3 @@ const ResultSummary: React.FC<ResultSummaryProps> = ({
 
 export { groupImages }; // for use in FishComparison
 export default ResultSummary;
-
