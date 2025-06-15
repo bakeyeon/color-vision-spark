@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, Download } from "lucide-react";
+import { LogOut, Download, FileText } from "lucide-react";
 import { type TrialResult } from "./ExperimentPanel";
 import { type QuestionnaireData } from "./Questionnaire";
 import PasswordChangeDialog from "./PasswordChangeDialog";
@@ -84,15 +84,114 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
     });
   };
 
+  const downloadCSV = () => {
+    if (data.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "No Data",
+        description: "No data available to download.",
+      });
+      return;
+    }
+
+    const csvRows = [];
+    
+    // CSV Header
+    csvRows.push([
+      'Participant',
+      'Age Group',
+      'Country',
+      'Years in Country',
+      'Language',
+      'Media Type',
+      'Media Kind',
+      'Media Hours',
+      'Trial Number',
+      'Estimate',
+      'Actual',
+      'Duration (s)',
+      'Level',
+      'Subtle',
+      'Submitted At'
+    ].join(','));
+
+    // CSV Data
+    data.forEach((entry, participantIndex) => {
+      const participantNum = participantIndex + 1;
+      const q = entry.questionnaire;
+      
+      if (entry.experiment && entry.experiment.length > 0) {
+        entry.experiment.forEach((trial, trialIndex) => {
+          csvRows.push([
+            participantNum,
+            q?.ageGroup || '',
+            q?.country || '',
+            q?.yearsInCountry || '',
+            q?.language || '',
+            q?.mediaType || '',
+            q?.mediaKind || '',
+            q?.mediaHours || '',
+            trialIndex + 1,
+            trial.estimate,
+            trial.numBlocks,
+            trial.duration.toFixed(1),
+            trial.level,
+            trial.subtle ? 'Yes' : 'No',
+            entry.submitted_at
+          ].map(field => `"${field}"`).join(','));
+        });
+      } else {
+        // If no experiment data, still include questionnaire data
+        csvRows.push([
+          participantNum,
+          q?.ageGroup || '',
+          q?.country || '',
+          q?.yearsInCountry || '',
+          q?.language || '',
+          q?.mediaType || '',
+          q?.mediaKind || '',
+          q?.mediaHours || '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          entry.submitted_at
+        ].map(field => `"${field}"`).join(','));
+      }
+    });
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `experiment-data-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "CSV Download Started",
+      description: "Data has been downloaded as CSV file.",
+    });
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Admin Panel - Experiment Data</h1>
         <div className="flex gap-2">
           <PasswordChangeDialog />
+          <Button onClick={downloadCSV} variant="outline">
+            <FileText className="w-4 h-4 mr-2" />
+            Download CSV
+          </Button>
           <Button onClick={downloadData} variant="outline">
             <Download className="w-4 h-4 mr-2" />
-            Download Data
+            Download JSON
           </Button>
           <Button onClick={handleLogout} variant="outline">
             <LogOut className="w-4 h-4 mr-2" />
