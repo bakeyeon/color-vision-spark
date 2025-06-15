@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,26 @@ interface StoredData {
 interface Props {
   onLogout: () => void;
 }
+
+const fishGroupNames: Record<number, string> = {
+  1: "Blue Marlin",
+  2: "Pufferfish",
+  3: "Mandarinfish",
+  4: "Loach",
+  5: "Squid",
+  6: "Flatfish",
+  7: "Mola mola",
+};
+
+const fishGroupEmojis: Record<number, string> = {
+  1: "🐟",
+  2: "🐡",
+  3: "🐠",
+  4: "🦠",
+  5: "🦑",
+  6: "🦦",
+  7: "🐡",
+};
 
 const AdminPanel: React.FC<Props> = ({ onLogout }) => {
   const [data, setData] = useState<StoredData[]>([]);
@@ -214,7 +233,9 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
       return {
         totalParticipants: 0,
         averageScore: 0,
-        mostUsedMediaType: 'N/A'
+        mostUsedMediaType: 'N/A',
+        mostCommonFishType: 'N/A',
+        mostCommonFishGroup: null as number | null,
       };
     }
 
@@ -250,11 +271,46 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
           mediaTypeCounts[a] > mediaTypeCounts[b] ? a : b
         )
       : 'N/A';
-    
+
+    // Find most common fish type, grouping by 'group' property on experiment[0]
+    const groupCounts: Record<number, number> = {};
+    data.forEach(entry => {
+      // Try to find group value; look for each experiment trial's 'group'
+      if (entry.experiment && entry.experiment.length > 0) {
+        // Try per trial
+        entry.experiment.forEach(trial => {
+          if ((trial as any).group) {
+            const g = (trial as any).group;
+            groupCounts[g] = (groupCounts[g] || 0) + 1;
+          }
+        });
+        // Alternatively, use group on first trial if available
+        if ((entry.experiment[0] as any).group) {
+          const g = (entry.experiment[0] as any).group;
+          groupCounts[g] = (groupCounts[g] || 0) + 1;
+        }
+      }
+    });
+
+    let mostCommonFishGroup: number | null = null;
+    let mostCommonFishCount = 0;
+    for (const [g, count] of Object.entries(groupCounts)) {
+      if (count > mostCommonFishCount) {
+        mostCommonFishCount = count;
+        mostCommonFishGroup = Number(g);
+      }
+    }
+    const mostCommonFishType =
+      mostCommonFishGroup && fishGroupNames[mostCommonFishGroup]
+        ? fishGroupNames[mostCommonFishGroup]
+        : 'N/A';
+
     return {
       totalParticipants,
       averageScore: Math.round(averageScore * 10) / 10,
-      mostUsedMediaType
+      mostUsedMediaType,
+      mostCommonFishType,
+      mostCommonFishGroup,
     };
   };
 
@@ -297,7 +353,7 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
           </TabsList>
           
           <TabsContent value="overview">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
@@ -339,6 +395,29 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
                   <div className="text-2xl font-bold">{overviewStats.mostUsedMediaType}</div>
                   <p className="text-xs text-muted-foreground">
                     Most common media type
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Most Common Fish Type
+                  </CardTitle>
+                  <span className="h-4 w-4 text-lg">
+                    {
+                      overviewStats.mostCommonFishGroup
+                        ? fishGroupEmojis[overviewStats.mostCommonFishGroup] || "🐟"
+                        : "🐟"
+                    }
+                  </span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {overviewStats.mostCommonFishType}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Most represented “persona group”
                   </p>
                 </CardContent>
               </Card>
