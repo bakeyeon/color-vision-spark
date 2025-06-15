@@ -102,6 +102,17 @@
   }
 }
 
+/* --- BEGIN Custom Pixel Ocean Background --- */
+.cute-ocean-bg {
+  min-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: url("/lovable-uploads/e44668cb-4181-4428-b872-8a64de8c91e1.png") center center no-repeat;
+  background-size: cover;
+  position: relative;
+}
+/* --- END Custom Pixel Ocean Background --- */
+
 /* --- BEGIN Mock PNG ocean background --- */
 .cute-ocean-bg {
   min-height: 100vh;
