@@ -330,13 +330,13 @@ const AppHome: React.FC = () => {
                 </li>
                 <li>
                   Colors always move smoothly from{" "}
+                  <span className="font-medium text-blue-800">dark blue</span>
+                  {" → "}
                   <span className="font-medium text-blue-600">blue</span>
                   {" → "}
                   <span className="font-medium text-blue-400">pale blue</span>
                   {" → "}
                   <span className="font-medium text-blue-300">light blue</span>
-                  {" → "}
-                  <span className="font-medium text-blue-800">dark blue</span>
                   {" → "}
                   <span className="font-semibold text-blue-900">white</span>.
                 </li>
