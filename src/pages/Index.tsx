@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
@@ -294,15 +293,23 @@ const AppHome: React.FC = () => {
     };
   }, [correctRate, avgSpeed, clusterGroup]);
 
+  // Add a header click handler that resets to intro phase
+  const handleTitleClick = () => setPhase("intro");
+
   return (
     <div className="cute-ocean-bg flex flex-col items-center px-2 lg:px-0">
       {/* Decorative coral SVGs (bottom corners) */}
       <div className="coral-corner" aria-hidden="true" />
       <div className="coral-corner right" aria-hidden="true" />
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
-        <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif font-cute">
+        <button
+          onClick={handleTitleClick}
+          className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif font-cute bg-transparent border-none cursor-pointer p-0 hover:underline focus:outline-none"
+          style={{ background: "none" }}
+          aria-label="Go to start page"
+        >
           Colorfish Test
-        </h1>
+        </button>
         {/* Admin button in header */}
         {phase === "intro" && (
           <Button
