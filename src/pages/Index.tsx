@@ -296,8 +296,7 @@ const AppHome: React.FC = () => {
           <img
             src="/lovable-uploads/0caba236-82e1-45e5-a081-24f26810215c.png"
             alt="Cute pixel art of a sunfish and a dog"
-            className="w-64 max-w-[90vw] h-auto mx-auto rounded-lg mb-3 drop-shadow-lg bg-white/80"
-            style={{ border: "4px solid #e2e8f0" }}
+            className="w-64 max-w-[90vw] h-auto mx-auto rounded-lg bg-white/80 mb-3"
           />
         )}
         <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif font-cute">
