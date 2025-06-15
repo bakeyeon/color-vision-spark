@@ -5,8 +5,9 @@ import { getGradientColors } from "@/lib/gradient-utils";
 interface GradientBarProps {
   numBlocks: number;
   subtle?: boolean;
-  totalWidth?: number; // Total width in px, all blocks sum to this
+  totalWidth?: number;
   className?: string;
+  colorEnd?: [number, number, number]; // RGB endpoint
 }
 
 function randomWidths(numBlocks: number, total: number): number[] {
@@ -38,8 +39,9 @@ const GradientBar: React.FC<GradientBarProps> = ({
   subtle,
   totalWidth = 600,
   className = "",
+  colorEnd,
 }) => {
-  const colors = getGradientColors(numBlocks);
+  const colors = getGradientColors(numBlocks, colorEnd);
   const widths = React.useMemo(() => randomWidths(numBlocks, totalWidth), [numBlocks, totalWidth]);
 
   return (
@@ -70,4 +72,3 @@ const GradientBar: React.FC<GradientBarProps> = ({
 };
 
 export default GradientBar;
-

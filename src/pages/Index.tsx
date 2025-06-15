@@ -104,9 +104,8 @@ const AppHome: React.FC = () => {
         <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif">
           Colorfish Test
         </h1>
-        {/* Removed "Test your ability to detect subtle color transitions." */}
+        {/* Removed subtitle */}
       </header>
-
       <main className="flex flex-col items-center w-full">
         {phase === "intro" && (
           <Card className="max-w-2xl w-full mx-auto border-2 shadow-xl bg-white/90 backdrop-blur-sm ring-1 ring-blue-300">
@@ -134,14 +133,18 @@ const AppHome: React.FC = () => {
                   <b className="text-blue-900">Your task:</b> Count how many perceptually distinct color segments (visible divisions) you can spot—even if the colors seem very similar!
                 </li>
                 <li>
-                  Colors always move smoothly from <span className="font-medium text-blue-600">white</span>
+                  Colors always move smoothly from <span className="font-medium text-blue-600">blue</span>
+                  {" → "}
+                  <span className="font-medium text-blue-400">pale blue</span>
                   {" → "}
                   <span className="font-medium text-blue-300">light blue</span>
                   {" → "}
-                  <span className="font-medium text-blue-800">dark blue</span>.
+                  <span className="font-medium text-blue-800">dark blue</span>
+                  {" → "}
+                  <span className="font-medium text-gray-100">white</span>.
                 </li>
                 <li>
-                  Some trials use <span className="text-blue-400/70">subtle gradients</span>; others use sharper divisions.
+                  Some trials use <span className="text-blue-400/70">very subtle gradients</span>; others use sharper divisions—watch for both!
                 </li>
               </ul>
               <div className="mb-2 text-blue-900">
@@ -176,22 +179,7 @@ const AppHome: React.FC = () => {
         {/* Result/persona summary is after questionnaire */}
         {phase === "summary" && (
           <Card className="max-w-3xl w-full mx-auto shadow-lg border-2 mt-10">
-            <CardHeader>
-              <CardTitle>Experiment Complete!</CardTitle>
-            </CardHeader>
             <CardContent>
-              {/* Share button */}
-              <div className="flex justify-end mb-4">
-                <Button
-                  variant="outline"
-                  onClick={handleShare}
-                  className="gap-2"
-                  aria-label="Share this test"
-                >
-                  <Share className="inline-block" />
-                  Share this test with friends
-                </Button>
-              </div>
               {/* Casual persona result + histogram graphs */}
               {clusterGroup !== null && (
                 <ResultSummary
@@ -212,13 +200,14 @@ const AppHome: React.FC = () => {
               <div className="text-base mb-2 font-semibold">
                 Your trial data:
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto mb-6">
                 <table className="w-full border">
                   <thead>
                     <tr className="bg-muted">
                       <th className="px-2 py-1 text-xs font-medium text-left">#</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Bar</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Transition</th>
+                      <th className="px-2 py-1 text-xs font-medium text-left">Level</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Est. Segments</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Actual Blocks</th>
                       <th className="px-2 py-1 text-xs font-medium text-left">Time (s)</th>
@@ -230,6 +219,9 @@ const AppHome: React.FC = () => {
                         <td className="px-2 py-1">{i + 1}</td>
                         <td className="px-2 py-1">▇</td>
                         <td className="px-2 py-1">{res.subtle ? "Subtle" : "Distinct"}</td>
+                        <td className="px-2 py-1">
+                          {res.level === 1 ? "Norm." : res.level === 2 ? "Subtle" : "Extra"}
+                        </td>
                         <td className="px-2 py-1 font-bold">{res.estimate}</td>
                         <td className="px-2 py-1">{res.numBlocks}</td>
                         <td className="px-2 py-1">{res.duration.toFixed(1)}</td>
@@ -238,8 +230,20 @@ const AppHome: React.FC = () => {
                   </tbody>
                 </table>
               </div>
+              {/* Share button at the very bottom */}
+              <div className="flex justify-end mt-4">
+                <Button
+                  variant="outline"
+                  onClick={handleShare}
+                  className="gap-2"
+                  aria-label="Share this test"
+                >
+                  <Share className="inline-block" />
+                  Share this test with friends
+                </Button>
+              </div>
             </CardContent>
-            {/* No footer button: user just sees results and can reload for retry */}
+            {/* No CardFooter */}
           </Card>
         )}
       </main>

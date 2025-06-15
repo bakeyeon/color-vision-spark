@@ -7,10 +7,19 @@ interface ClusterParams {
     estimate: number | null;
     numBlocks: number;
     duration: number;
+    subtle?: boolean;
+    level?: number;
   }>;
-  correctTolerance?: number; // can configure how close an estimate is "correct", e.g., ±1 by default
-  minAnswered?: number; // e.g., 3 out of 6
+  correctTolerance?: number;
+  minAnswered?: number;
 }
+
+// Weighted scoring: more subtle trials count more
+const LEVEL_SCORE = {
+  1: 1, // Easiest
+  2: 2, // Subtle
+  3: 3, // Very subtle
+};
 
 export function assignClusterGroup({
   results,
@@ -21,22 +30,24 @@ export function assignClusterGroup({
   if (answered.length < minAnswered) {
     return 7;
   }
-  // Calculate correct answers (within ±tolerance)
-  const correct = answered.filter(r =>
-    Math.abs((r.estimate ?? 0) - r.numBlocks) <= correctTolerance
-  );
-  const correctRate = correct.length / results.length;
+  // Calculate score: If answer within range, get the weight/score
+  let totalScore = 0;
+  let maxScore = 0;
+  answered.forEach(res => {
+    const level = res.level ?? 1;
+    maxScore += LEVEL_SCORE[level] ?? 1;
+    if (Math.abs((res.estimate ?? 0) - res.numBlocks) <= correctTolerance) {
+      totalScore += LEVEL_SCORE[level] ?? 1;
+    }
+  });
+  const correctRate = maxScore === 0 ? 0 : totalScore / maxScore;
   const avgDuration = answered.reduce((s, r) => s + r.duration, 0) / answered.length || 0;
 
-  // For demo: Use 3 bins for accuracy * 2 bins for speed = 6 clusters
-  // Accuracy: low (≤33%), med (34–66%), high (≥67%)
-  // Speed: slow (avg >5s), fast (avg ≤5s)
+  // 3 accuracy bins × 2 speed bins = 6 clusters (plus unresponsive)
   let accTier = 1;
   if (correctRate >= 0.67) accTier = 3;
   else if (correctRate >= 0.34) accTier = 2;
 
   let speedTier = avgDuration <= 5 ? 1 : 2;
-
-  // Tier mapping: (accTier-1)*2+speedTier = 1..6
   return ((accTier - 1) * 2 + speedTier) as ClusterGroup;
 }

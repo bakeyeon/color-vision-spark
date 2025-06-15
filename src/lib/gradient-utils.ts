@@ -1,14 +1,17 @@
 
 /**
- * Utility to generate a gradient between pure blue and white,
+ * Utility to generate a gradient between blue and "endpoint" (default: white),
  * using finely interpolated steps in RGB space.
- *
- * The gradient is from blue (base) → white, avoiding any green/cyan.
- * All intermediate color stops are calculated between blue and white.
+ * The gradient is from blue (base) → endpoint (white or pale blue).
  */
 
-const BLUE = { r: 0, g: 56, b: 168 }; // Deep "royal" blue base, matches earlier code.
+const BLUE = { r: 0, g: 56, b: 168 };
 const WHITE = { r: 255, g: 255, b: 255 };
+
+// Converts RGB tuple to color object
+function tupleToColor(arr: [number, number, number]) {
+  return { r: arr[0], g: arr[1], b: arr[2] };
+}
 
 // Helper to interpolate linearly between two colors in RGB
 function lerpColor(a, b, t: number) {
@@ -34,14 +37,16 @@ function rgbToHex(c: { r: number; g: number; b: number }) {
 
 /**
  * Returns an array of finely-interpolated hex colors for the N blocks,
- * strictly from blue to white.
+ * from blue to "endpoint" (by default, white).
  */
-export function getGradientColors(count: number): string[] {
+export function getGradientColors(count: number, endpoint?: [number, number, number]): string[] {
+  const endColor = endpoint ? tupleToColor(endpoint) : WHITE;
   const out: string[] = [];
   for (let i = 0; i < count; ++i) {
-    const t = count === 1 ? 0 : i / (count - 1); // even steps from 0 to 1
-    const interp = lerpColor(BLUE, WHITE, t);
+    const t = count === 1 ? 0 : i / (count - 1);
+    const interp = lerpColor(BLUE, endColor, t);
     out.push(rgbToHex(interp));
   }
   return out;
 }
+

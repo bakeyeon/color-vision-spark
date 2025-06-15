@@ -12,19 +12,64 @@ interface TrialResult {
   estimate: number | null;
   duration: number;
   subtle: boolean;
+  level: number; // 1=easiest, 2=subtle, 3=super subtle
+  colorEnd: [number, number, number]; // RGB endpoint for the bar
 }
 
-const TRIALS_COUNT = 6;
-const MIN_BLOCKS = 8;
-const MAX_BLOCKS = 30;
+const TRIALS_COUNT = 12;
+
+const BASE_BLUE = [0, 56, 168];
+const WHITE = [255, 255, 255];
+const INTERMEDIATE_ENDPOINTS = [
+  [100, 150, 255], // Pale blue
+  [94, 166, 246],  // Powder blue
+  [143, 180, 240], // Sky-ish
+  [170, 205, 244], // Pastel blue
+];
+
+// Generate a gradient endpoint that’s always “between blue and white”
+function randomEndpoint() {
+  // 50% chance for white, 30% for intermediate, 20% for "deeper" blue (closer to base)
+  const r = Math.random();
+  if (r < 0.2) return BASE_BLUE;
+  if (r < 0.5) return INTERMEDIATE_ENDPOINTS[Math.floor(Math.random() * INTERMEDIATE_ENDPOINTS.length)];
+  return WHITE;
+}
 
 function randomInt(min: number, max: number) {
   return min + Math.floor(Math.random() * (max - min + 1));
 }
 
-function randomSubtlety(): boolean {
-  // 60% major transitions, 40% subtle
-  return Math.random() > 0.6;
+// Generate all trials up front with balanced/difficulty levels
+function generateTrialSet() {
+  // 2 easy, 2 subtle, 2 super subtle, repeat/shuffle to make 12
+  const blocksConfig = [
+    // [min, max, subtle, level]
+    [8, 15, false, 1],
+    [9, 17, false, 1],
+
+    [16, 25, true, 2],
+    [15, 22, true, 2],
+
+    [20, 30, true, 3],
+    [22, 28, true, 3],
+  ];
+  // Duplicate to make 12
+  let configs = [...blocksConfig, ...blocksConfig];
+  // Shuffle for randomness
+  for (let i = configs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [configs[i], configs[j]] = [configs[j], configs[i]];
+  }
+  return configs.map(([minB, maxB, subtle, level], i) => {
+    return {
+      trial: i + 1,
+      numBlocks: randomInt(minB, maxB),
+      subtle,
+      level,
+      colorEnd: randomEndpoint(),
+    };
+  });
 }
 
 interface ExperimentPanelProps {
@@ -38,20 +83,8 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
   const [timerOn, setTimerOn] = useState(false);
   const [trialStart, setTrialStart] = useState<number | null>(null);
 
-  // Define all trial config up front (horizontal only)
-  const trials = React.useMemo(() => {
-    return Array.from({ length: TRIALS_COUNT }).map((_, i) => {
-      const subtle = randomSubtlety();
-      const numBlocks = subtle
-        ? randomInt(16, MAX_BLOCKS)
-        : randomInt(MIN_BLOCKS, 16);
-      return {
-        trial: i + 1,
-        numBlocks,
-        subtle,
-      };
-    });
-  }, []);
+  // Define all trial config up front
+  const trials = React.useMemo(() => generateTrialSet(), []);
 
   // Timer logic
   const timerRef = useRef<number | undefined>(undefined);
@@ -95,7 +128,9 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       numBlocks: tCfg.numBlocks,
       subtle: tCfg.subtle,
       estimate,
-      duration: (trialEnd - (trialStart ?? trialEnd)) / 1000
+      duration: (trialEnd - (trialStart ?? trialEnd)) / 1000,
+      level: tCfg.level,
+      colorEnd: tCfg.colorEnd
     };
 
     setAnswers((prev) => [...prev, result]);
@@ -124,17 +159,24 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
         </CardTitle>
         <div className="text-sm text-muted-foreground">
           Count or estimate the <b>number of distinct color segments</b> visible in the bar below.<br />
-          {current.subtle ? (
-            <span>Smoother gradient; edges are challenging to see.</span>
+          {current.level === 1 ? (
+            <span>More visible edges. Easiest to count.</span>
+          ) : current.level === 2 ? (
+            <span>Subtle boundaries between colors. More difficult.</span>
           ) : (
-            <span>Strong color differences between blocks; easier to count.</span>
+            <span>Very subtle, almost seamless color transitions. Most challenging!</span>
           )}
+          <div className="text-xs mt-1">
+            <span className="font-semibold">Note:</span>{" "}
+            Gradient may end at blue, white, or a pale/pastel blue.
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col items-center py-6">
         <GradientBar
           numBlocks={current.numBlocks}
           subtle={current.subtle}
+          colorEnd={current.colorEnd}
           className={current.subtle ? "border-none shadow-none" : ""}
           totalWidth={600}
         />
@@ -180,4 +222,3 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
 
 export type { TrialResult };
 export default ExperimentPanel;
-
