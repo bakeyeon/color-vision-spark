@@ -118,7 +118,7 @@
   min-height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: url("/mock-bg.png") center center no-repeat;
+  background: url("/bg.png") center center no-repeat;
   background-size: cover;
   position: relative;
 }
