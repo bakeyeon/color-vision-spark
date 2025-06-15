@@ -1,4 +1,3 @@
-
 import React from "react";
 import SummaryChart from "./SummaryChart";
 import { ClusterGroup } from "@/lib/userCluster";
@@ -13,6 +12,13 @@ type ResultSummaryProps = {
   group: ClusterGroup;
   correctRate: number; // as 0–1
   avgSpeed: number; // secs
+  // Optional: precomputed chart data (to avoid randomization on re-render)
+  corrData?: { bin: string; count: number }[];
+  corrUserBin?: string;
+  corrUserPercentile?: number;
+  spdData?: { bin: string; count: number }[];
+  spdUserBin?: string;
+  spdUserPercentile?: number;
 };
 
 const groupPersonas: Record<ClusterGroup, { title: string; headline: string; description: string; emoji: string; advice: string }> = {
@@ -67,8 +73,8 @@ const groupPersonas: Record<ClusterGroup, { title: string; headline: string; des
   },
 };
 
-// Fake data generation for demonstration.
-function makeHistogramData(userValue: number, bins: number, min: number, max: number) {
+// Export for useMemo in Index
+export function makeHistogramData(userValue: number, bins: number, min: number, max: number) {
   // Gaussian distribution, user likely on upper end for demo; bin user appropriately.
   const range = max - min;
   const data: { bin: string; count: number }[] = [];
@@ -98,15 +104,22 @@ function makeHistogramData(userValue: number, bins: number, min: number, max: nu
   return { data, userBin, userPercentile };
 }
 
-const ResultSummary: React.FC<ResultSummaryProps> = ({ group, correctRate, avgSpeed }) => {
-  // Rate as %
+const ResultSummary: React.FC<ResultSummaryProps> = ({
+  group, correctRate, avgSpeed,
+  corrData, corrUserBin, corrUserPercentile,
+  spdData, spdUserBin, spdUserPercentile
+}) => {
+  // Fallback to generating if not provided (for compatibility)
   const rate100 = Math.round(correctRate * 100);
-  const { data: corrData, userBin: corrUserBin, userPercentile: corrPct } = makeHistogramData(
-    rate100, 8, 0, 100
-  );
-  const { data: spdData, userBin: spdUserBin, userPercentile: spdPct } = makeHistogramData(
-    avgSpeed, 6, 1, 15
-  );
+  const corr =
+    corrData && corrUserBin && typeof corrUserPercentile === "number"
+      ? { data: corrData, userBin: corrUserBin, userPercentile: corrUserPercentile }
+      : makeHistogramData(rate100, 8, 0, 100);
+
+  const spd =
+    spdData && spdUserBin && typeof spdUserPercentile === "number"
+      ? { data: spdData, userBin: spdUserBin, userPercentile: spdUserPercentile }
+      : makeHistogramData(avgSpeed, 6, 1, 15);
 
   const persona = groupPersonas[group];
 
@@ -123,25 +136,25 @@ const ResultSummary: React.FC<ResultSummaryProps> = ({ group, correctRate, avgSp
       {/* Charts */}
       <SummaryChart
         title="Correct Answer Rate (%)"
-        data={corrData}
-        userBin={corrUserBin}
-        userPercentile={corrPct}
-        annotation={corrPct > 95 ? "You have a sense of the top few percent!" :
-          corrPct > 75 ? "You are well above average!" :
-            corrPct > 60 ? "Solid sense! A reliable observer." :
-              corrPct > 40 ? "Middle of the school. Still insightful!" :
+        data={corr.data}
+        userBin={corr.userBin}
+        userPercentile={corr.userPercentile}
+        annotation={corr.userPercentile > 95 ? "You have a sense of the top few percent!" :
+          corr.userPercentile > 75 ? "You are well above average!" :
+            corr.userPercentile > 60 ? "Solid sense! A reliable observer." :
+              corr.userPercentile > 40 ? "Middle of the school. Still insightful!" :
                 "Plenty of room to show your true colors!"
         }
         color="#1f9cd1"
       />
       <SummaryChart
         title="Response Speed (s)"
-        data={spdData}
-        userBin={spdUserBin}
-        userPercentile={100 - spdPct}
-        annotation={spdPct < 5 ? "Lightning fast! World-class reactions!" :
-          spdPct < 40 ? "Sharp and attentive!" :
-            spdPct < 70 ? "Consistently focused." :
+        data={spd.data}
+        userBin={spd.userBin}
+        userPercentile={spd.userPercentile}
+        annotation={spd.userPercentile < 5 ? "Lightning fast! World-class reactions!" :
+          spd.userPercentile < 40 ? "Sharp and attentive!" :
+            spd.userPercentile < 70 ? "Consistently focused." :
               "Taking your time isn't always bad!"
         }
         color="#7fdac3"

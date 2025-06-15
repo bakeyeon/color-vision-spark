@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
@@ -176,6 +176,37 @@ const AppHome: React.FC = () => {
   // New: state for table toggle
   const [showTrialData, setShowTrialData] = useState(false);
 
+  // Copy makeHistogramData to Index
+  function makeHistogramData(userValue: number, bins: number, min: number, max: number) {
+    // Gaussian distribution, user likely on upper end for demo; bin user appropriately.
+    const range = max - min;
+    const data: { bin: string; count: number }[] = [];
+    const binStep = range / bins;
+    let totalCount = 0;
+    let userBinIdx = 0;
+    for (let i = 0; i < bins; i++) {
+      const from = min + i * binStep;
+      const to = min + (i + 1) * binStep;
+      const label = `${Math.round(from)}–${Math.round(to)}`;
+      // Bell curve, slightly favoring middle, but random
+      const center = (min + max) / 2;
+      let base = Math.exp(-0.5 * Math.pow((from + to) / 2 - center, 2) / Math.pow(range / 3, 2));
+      // Add some randomness:
+      base = base * (10 + Math.random() * 5);
+      const count = Math.round(base + Math.random() * 5);
+      data.push({ bin: label, count });
+      totalCount += count;
+
+      // Find which bin user is in
+      if (userValue >= from && userValue < to) userBinIdx = i;
+    }
+    // Place user in the right bin
+    const userBin = data[userBinIdx]?.bin ?? data[0]?.bin;
+    // Compute percentile (fake: % of bins below user)
+    const userPercentile = ((userBinIdx + 1) / bins) * 100;
+    return { data, userBin, userPercentile };
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
@@ -259,19 +290,17 @@ const AppHome: React.FC = () => {
           <Card className="max-w-3xl w-full mx-auto shadow-lg border-2 mt-10">
             <CardContent>
               {/* Casual persona result + histogram graphs */}
-              {clusterGroup !== null && (
+              {clusterGroup !== null && memoizedHistogram && (
                 <ResultSummary
                   group={clusterGroup}
-                  correctRate={
-                    results.length > 0
-                      ? results.filter((r) => r.estimate !== null && Math.abs((r.estimate ?? 0) - r.numBlocks) <= 1).length / results.length
-                      : 0
-                  }
-                  avgSpeed={
-                    results.length > 0
-                      ? results.filter((r) => typeof r.duration === "number").reduce((s, r) => s + r.duration, 0) / results.length
-                      : 0
-                  }
+                  correctRate={correctRate}
+                  avgSpeed={avgSpeed}
+                  corrData={memoizedHistogram.corrData.data}
+                  corrUserBin={memoizedHistogram.corrData.userBin}
+                  corrUserPercentile={memoizedHistogram.corrData.userPercentile}
+                  spdData={memoizedHistogram.spdData.data}
+                  spdUserBin={memoizedHistogram.spdData.userBin}
+                  spdUserPercentile={100 - memoizedHistogram.spdData.userPercentile}
                 />
               )}
 
