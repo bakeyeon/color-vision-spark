@@ -104,11 +104,12 @@ const AppHome: React.FC = () => {
   const [results, setResults] = useState<TrialResult[]>([]);
   const [demographics, setDemographics] = useState<QuestionnaireData | null>(null);
 
-  const start = () => setPhase("experiment");
+  const [skipCount, setSkipCount] = useState(0);
 
   // After experiment, go directly to questionnaire
-  const handleExperimentComplete = (res: TrialResult[]) => {
+  const handleExperimentComplete = (res: TrialResult[], skips: number) => {
     setResults(res);
+    setSkipCount(skips);
     setPhase("questionnaire");
   };
 
@@ -118,9 +119,25 @@ const AppHome: React.FC = () => {
     setPhase("summary");
   };
 
+  const assignUserClusterGroup = (): ClusterGroup => {
+    if (skipCount > 6) return 7;
+    return assignClusterGroup({ results });
+  };
+
+  // Exclude the main group when picking the two closest fish for display
+  function getClosestOtherFish(userGroup: number): [typeof fishList[0], typeof fishList[0]] {
+    // Filter out the user's group
+    const filtered = fishList.filter(f => f.id !== userGroup);
+    // Always prioritize Flatfish (6) and Mola mola (7) unless excluded
+    const flatfish = filtered.find(f => f.id === 6)!;
+    const mola = filtered.find(f => f.id === 7)!;
+    // Pick the two "closest" as flatfish and mola, if available
+    return [mola, flatfish];
+  }
+
   const clusterGroup: ClusterGroup | null =
     phase === "summary" && results.length > 0
-      ? assignClusterGroup({ results })
+      ? assignUserClusterGroup()
       : null;
 
   // Share functionality, using Web Share API if available, fallback to copying URL
@@ -138,6 +155,8 @@ const AppHome: React.FC = () => {
       alert("Link copied to clipboard!");
     }
   };
+
+  const start = () => setPhase("experiment");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
@@ -272,11 +291,11 @@ const AppHome: React.FC = () => {
                 </table>
               </div>
 
-              {/* Dynamically rendered fish comparison section */}
+              {/* Dynamically rendered fish comparison section, now using exclusion */}
               {clusterGroup !== null && (
                 <FishComparison
-                  left={getClosestFish(clusterGroup)[0]}
-                  right={getClosestFish(clusterGroup)[1]}
+                  left={getClosestOtherFish(clusterGroup)[0]}
+                  right={getClosestOtherFish(clusterGroup)[1]}
                 />
               )}
 

@@ -69,7 +69,7 @@ function generateTrialSet() {
 }
 
 interface ExperimentPanelProps {
-  onComplete(results: TrialResult[]): void;
+  onComplete(results: TrialResult[], skips: number): void;
 }
 
 const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
@@ -78,6 +78,7 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
   const [inputVal, setInputVal] = useState("");
   const [timerOn, setTimerOn] = useState(false);
   const [trialStart, setTrialStart] = useState<number | null>(null);
+  const [skipCount, setSkipCount] = useState(0);
 
   // Define all trials up front
   const trials = React.useMemo(() => generateTrialSet(), []);
@@ -135,7 +136,36 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       if (trialIdx + 1 < trials.length) {
         setTrialIdx(trialIdx + 1);
       } else {
-        onComplete([...answers, result]);
+        onComplete([...answers, result], skipCount);
+      }
+    }, 400);
+
+    setInputVal(""); // Clear input while moving to next
+  };
+
+  const handleSkip = () => {
+    const tCfg = trials[trialIdx];
+    setTimerOn(false);
+
+    // Record a skipped trial with null estimate
+    const result: TrialResult = {
+      trial: tCfg.trial,
+      numBlocks: tCfg.numBlocks,
+      subtle: tCfg.subtle,
+      estimate: null,
+      duration: 0,
+      level: tCfg.level,
+      colorEnd: tCfg.colorEnd,
+    };
+
+    setAnswers((prev) => [...prev, result]);
+    setSkipCount((c) => c + 1);
+
+    setTimeout(() => {
+      if (trialIdx + 1 < trials.length) {
+        setTrialIdx(trialIdx + 1);
+      } else {
+        onComplete([...answers, result], skipCount + 1);
       }
     }, 400);
 
@@ -209,7 +239,13 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
           <Button type="submit" disabled={!timerOn || inputVal === ""}>
             Submit
           </Button>
+          <Button type="button" variant="secondary" onClick={handleSkip} disabled={!timerOn}>
+            Skip
+          </Button>
         </form>
+        <div className="text-xs text-gray-500 mt-1">
+          Skipped: {skipCount} / {TRIALS_COUNT}
+        </div>
       </CardFooter>
     </Card>
   );
