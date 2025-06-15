@@ -128,11 +128,26 @@ const AppHome: React.FC = () => {
   function getClosestOtherFish(userGroup: number): [typeof fishList[0], typeof fishList[0]] {
     // Filter out the user's group
     const filtered = fishList.filter(f => f.id !== userGroup);
-    // Always prioritize Flatfish (6) and Mola mola (7) unless excluded
-    const flatfish = filtered.find(f => f.id === 6)!;
-    const mola = filtered.find(f => f.id === 7)!;
-    // Pick the two "closest" as flatfish and mola, if available
-    return [mola, flatfish];
+    // If both flatfish (6) and mola mola (7) are still present, use them
+    const candidates = [filtered.find(f => f.id === 7), filtered.find(f => f.id === 6)]
+      .filter(Boolean) as typeof fishList[0][];
+    // If we already have two, return them
+    if (candidates.length === 2) return [candidates[0], candidates[1]];
+    // Otherwise, fill with first other unique fish(es) from filtered
+    let rest = filtered.filter(
+      f => !candidates.some(c => c.id === f.id)
+    );
+    while (candidates.length < 2 && rest.length > 0) {
+      candidates.push(rest.shift()!);
+    }
+    // As absolute fallback, use any two from fishList not equal to userGroup and not repeated; 
+    if (candidates.length < 2) {
+      const others = fishList.filter(f => f.id !== userGroup && !candidates.includes(f));
+      while (candidates.length < 2 && others.length > 0) candidates.push(others.shift()!);
+    }
+    // Defensive: if still not enough (very unlikely), duplicate one entry
+    if (candidates.length === 1) candidates.push(candidates[0]);
+    return [candidates[0], candidates[1]];
   }
 
   const clusterGroup: ClusterGroup | null =
