@@ -308,7 +308,7 @@ const AppHome: React.FC = () => {
             <CardContent className="text-base text-blue-700 text-center bg-white rounded-md px-2 py-1">
               <div className="italic text-blue-600 mb-2">"Among fish that react to colors, what kind of visual-linguistic sense are you?"</div>
               <img
-                src="/lovable-uploads/0caba236-82e1-45e5-a081-24f26810215c.png"
+                src="/lovable-uploads/f1b76c22-869a-4916-af49-2fd181162b76.png"
                 alt="Cute pixel art of a sunfish and a dog"
                 className="w-64 max-w-[90vw] h-auto mx-auto rounded-lg bg-white/80 mb-3"
               />
