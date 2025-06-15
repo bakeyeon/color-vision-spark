@@ -291,14 +291,6 @@ const AppHome: React.FC = () => {
       <div className="coral-corner" aria-hidden="true" />
       <div className="coral-corner right" aria-hidden="true" />
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
-        {/* --- ADD INTRO IMAGE ABOVE TITLE --- */}
-        {phase === "intro" && (
-          <img
-            src="/lovable-uploads/0caba236-82e1-45e5-a081-24f26810215c.png"
-            alt="Cute pixel art of a sunfish and a dog"
-            className="w-64 max-w-[90vw] h-auto mx-auto rounded-lg bg-white/80 mb-3"
-          />
-        )}
         <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif font-cute">
           Colorfish Test
         </h1>
@@ -314,6 +306,12 @@ const AppHome: React.FC = () => {
             </CardHeader>
             <CardContent className="text-base text-blue-700">
               <div className="italic text-blue-600 mb-2">"Among fish that react to colors, what kind of visual-linguistic sense are you?"</div>
+              {/* Intro image now appears here, right after the italic text */}
+              <img
+                src="/lovable-uploads/0caba236-82e1-45e5-a081-24f26810215c.png"
+                alt="Cute pixel art of a sunfish and a dog"
+                className="w-64 max-w-[90vw] h-auto mx-auto rounded-lg bg-white/80 mb-3"
+              />
               <p className="mb-3">
                 The way we see colors varies from person to person.
                 <br /><br />
