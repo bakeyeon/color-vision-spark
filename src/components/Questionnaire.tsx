@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,6 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
         headers: {
           "Content-Type": "application/json"
         },
-        mode: "no-cors",
         body: JSON.stringify({
           questionnaire: data,
           experiment: experimentResults,
