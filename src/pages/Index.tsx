@@ -81,7 +81,7 @@ const AppHome: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
         <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif">
-          Color Gradient Perception Experiment
+          Colorfish Test
         </h1>
         <p className="text-lg text-blue-500 max-w-2xl mb-2">
           Test your ability to detect subtle color transitions.
