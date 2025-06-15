@@ -101,3 +101,47 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* --- BEGIN Cute ocean background accents --- */
+.cute-ocean-bg {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(180deg, #a5e4ff 0%, #77cdf4 30%, #60bae9 60%, #e0f8ff 100%);
+}
+.cute-ocean-bg::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 20vw;
+  background: radial-gradient(circle at 50% 0%, #fff3 0%, #ffffff00 90%);
+  z-index: 0;
+}
+.coral-corner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 35vw;
+  height: 17vw;
+  background: url("data:image/svg+xml,%3Csvg width='600' height='340' viewBox='0 0 600 340' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg opacity='0.34'%3E%3Cellipse cx='482' cy='323' rx='108' ry='17' fill='%239B8DF7'/%3E%3Cellipse cx='136' cy='326' rx='133' ry='14' fill='%23D6AFE9'/%3E%3Cpath d='M88 244C105 269 110 282 120 320L188 329C204 293 217 283 238 269C258 256 278 246 252 215C210 171 135 188 88 244Z' fill='%23FFB9B9'/%3E%3Cpath d='M69 310C66 286 76 255 95 221C122 173 180 170 215 202C237 222 238 239 218 262C190 295 171 306 162 327L110 319C95 296 91 322 69 310Z' fill='%23FFE081'/%3E%3Cpath d='M103 299C102 283 108 259 131 236C157 210 210 213 232 230C242 238 245 247 242 257C238 272 209 281 186 297C163 314 148 308 143 307C140 307 120 310 103 299Z' fill='%23A0E9D8'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.9;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.coral-corner.right {
+  left: unset;
+  right: 0;
+  transform: scaleX(-1);
+}
+
+@media (max-width: 768px) {
+  .coral-corner, .coral-corner.right {
+    width: 60vw;
+    height: 28vw;
+    opacity: 0.65;
+  }
+}
+/* --- END Cute ocean background accents --- */

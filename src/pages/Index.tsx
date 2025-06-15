@@ -233,7 +233,10 @@ const AppHome: React.FC = () => {
   }, [correctRate, avgSpeed, clusterGroup]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 via-white to-blue-50 flex flex-col items-center px-2 lg:px-0">
+    <div className="cute-ocean-bg flex flex-col items-center px-2 lg:px-0">
+      {/* Decorative coral SVGs (bottom corners) */}
+      <div className="coral-corner" aria-hidden="true" />
+      <div className="coral-corner right" aria-hidden="true" />
       <header className="pt-10 pb-4 flex flex-col items-center w-full">
         <h1 className="text-4xl md:text-5xl font-bold text-blue-800 drop-shadow mb-2 font-serif font-cute">
           Colorfish Test
