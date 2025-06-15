@@ -300,12 +300,11 @@ const AppHome: React.FC = () => {
         {phase === "intro" && (
           <Card className="max-w-2xl w-full mx-auto border-2 shadow-xl bg-white/90 backdrop-blur-sm ring-1 ring-blue-300">
             <CardHeader>
-              <CardTitle>
+              <CardTitle className="text-center">
                 🐟 <span className="text-blue-700 drop-shadow">What kind of fish are you?</span>
               </CardTitle>
             </CardHeader>
-            {/* Center align all text in CardContent */}
-            <CardContent className="text-base text-blue-700 text-center">
+            <CardContent className="text-base text-blue-700 text-center bg-blue-50/90 rounded-md px-2 py-1">
               <div className="italic text-blue-600 mb-2">"Among fish that react to colors, what kind of visual-linguistic sense are you?"</div>
               {/* Intro image now appears here, right after the italic text */}
               <img
