@@ -81,37 +81,37 @@ const groupDetails: Record<
   1: {
     name: "Blue Marlin",
     description:
-      "Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes. “Color calls me!”",
+      "Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes. "Color calls me!"",
     emoji: "🐟"
   },
   2: {
     name: "Pufferfish",
     description:
-      "Round, slow to color differences but stable - “Whether it’s mint or Tiffany, pretty things are pretty anyway~”",
+      "Round, slow to color differences but stable - "Whether it's mint or Tiffany, pretty things are pretty anyway~"",
     emoji: "🐡"
   },
   3: {
     name: "Mandarinfish",
     description:
-      "Extreme color enthusiast. Rich in language sense - “This is… a little more cobalt.” Can distinguish even subtle differences!",
+      "Extreme color enthusiast. Rich in language sense - "This is… a little more cobalt." Can distinguish even subtle differences!",
     emoji: "🐠"
   },
   4: {
     name: "Loach",
     description:
-      "Text-centric brain, insensitive to color - “More interested in sentence structure than color.”",
+      "Text-centric brain, insensitive to color - "More interested in sentence structure than color."",
     emoji: "🦠"
   },
   5: {
     name: "Squid",
     description:
-      "Weak in color recognition but rich in imagination - “This color… resembles my mood.” Owner of poetic sensibility!",
+      "Weak in color recognition but rich in imagination - "This color… resembles my mood." Owner of poetic sensibility!",
     emoji: "🦑"
   },
   6: {
     name: "Flatfish",
     description:
-      "Slow in response, focused on context rather than color - “I see color… but is that important?” Avoidant interpreter!",
+      "Slow in response, focused on context rather than color - "I see color… but is that important?" Avoidant interpreter!",
     emoji: "🦦"
   },
   7: {
@@ -214,18 +214,65 @@ const AppHome: React.FC = () => {
       : null;
 
   // Share functionality, using Web Share API if available, fallback to copying URL
-  const handleShare = () => {
+  const handleShare = async () => {
     const shareUrl = window.location.origin + "/";
-    const shareText = "Discover your own colorfish! Try this Colorfish Test:";
-    if (navigator.share) {
-      navigator.share({
-        title: "Colorfish Test",
-        text: shareText,
-        url: shareUrl,
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(shareUrl);
-      alert("Link copied to clipboard!");
+    
+    if (!clusterGroup) {
+      // Fallback if no result yet
+      const shareText = "Discover your own colorfish! Try this Colorfish Test:";
+      if (navigator.share) {
+        navigator.share({
+          title: "Colorfish Test",
+          text: shareText,
+          url: shareUrl,
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+        alert("Link copied to clipboard!");
+      }
+      return;
+    }
+
+    const fishName = groupDetails[clusterGroup].name;
+    const fishImage = groupImages[clusterGroup];
+    const shareText = `I am a ${fishName}! What colorfish are you?\nGo to the test:`;
+    const fullShareText = `${shareText} ${shareUrl}`;
+
+    try {
+      // Try to share with image if Web Share API supports it
+      if (navigator.share && fishImage?.src) {
+        // Convert image to blob for sharing
+        const response = await fetch(fishImage.src);
+        const blob = await response.blob();
+        const file = new File([blob], `${fishName.toLowerCase().replace(/\s+/g, '-')}.png`, { type: blob.type });
+
+        // Check if sharing files is supported
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: "Colorfish Test Result",
+            text: shareText,
+            url: shareUrl,
+            files: [file]
+          });
+          return;
+        }
+      }
+
+      // Fallback to text-only sharing
+      if (navigator.share) {
+        await navigator.share({
+          title: "Colorfish Test Result",
+          text: fullShareText,
+        });
+      } else {
+        // Final fallback: copy to clipboard
+        navigator.clipboard.writeText(fullShareText);
+        alert("Your result has been copied to clipboard! Share it with your friends!");
+      }
+    } catch (error) {
+      // If sharing fails, copy to clipboard
+      navigator.clipboard.writeText(fullShareText);
+      alert("Your result has been copied to clipboard! Share it with your friends!");
     }
   };
 
@@ -494,10 +541,10 @@ const AppHome: React.FC = () => {
                   variant="outline"
                   onClick={handleShare}
                   className="gap-2"
-                  aria-label="Share this test"
+                  aria-label="Share your colorfish result"
                 >
                   <Share className="inline-block" />
-                  Share this test with friends
+                  {clusterGroup ? `Share: I am a ${groupDetails[clusterGroup].name}!` : "Share this test with friends"}
                 </Button>
               </div>
             </CardContent>
