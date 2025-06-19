@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
@@ -343,11 +342,6 @@ const AppHome: React.FC = () => {
 
   // Add a header click handler that resets to intro phase
   const handleTitleClick = () => setPhase("intro");
-
-  const start = () => setPhase("experiment");
-  const goToAdmin = () => setPhase("admin");
-  const handleAdminLogin = () => setPhase("admin-panel");
-  const handleAdminLogout = () => setPhase("intro");
 
   return (
     <div className="cute-ocean-bg flex flex-col items-center px-2 lg:px-0">
