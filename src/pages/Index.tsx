@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
@@ -81,37 +82,37 @@ const groupDetails: Record<
   1: {
     name: "Blue Marlin",
     description:
-      "Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes. "Color calls me!"",
+      "Fast recognition, sensitive to color differences, strong intuition - A sensory fish with sensitive eyes. \"Color calls me!\"",
     emoji: "🐟"
   },
   2: {
     name: "Pufferfish",
     description:
-      "Round, slow to color differences but stable - "Whether it's mint or Tiffany, pretty things are pretty anyway~"",
+      "Round, slow to color differences but stable - \"Whether it's mint or Tiffany, pretty things are pretty anyway~\"",
     emoji: "🐡"
   },
   3: {
     name: "Mandarinfish",
     description:
-      "Extreme color enthusiast. Rich in language sense - "This is… a little more cobalt." Can distinguish even subtle differences!",
+      "Extreme color enthusiast. Rich in language sense - \"This is… a little more cobalt.\" Can distinguish even subtle differences!",
     emoji: "🐠"
   },
   4: {
     name: "Loach",
     description:
-      "Text-centric brain, insensitive to color - "More interested in sentence structure than color."",
+      "Text-centric brain, insensitive to color - \"More interested in sentence structure than color.\"",
     emoji: "🦠"
   },
   5: {
     name: "Squid",
     description:
-      "Weak in color recognition but rich in imagination - "This color… resembles my mood." Owner of poetic sensibility!",
+      "Weak in color recognition but rich in imagination - \"This color… resembles my mood.\" Owner of poetic sensibility!",
     emoji: "🦑"
   },
   6: {
     name: "Flatfish",
     description:
-      "Slow in response, focused on context rather than color - "I see color… but is that important?" Avoidant interpreter!",
+      "Slow in response, focused on context rather than color - \"I see color… but is that important?\" Avoidant interpreter!",
     emoji: "🦦"
   },
   7: {
@@ -342,6 +343,11 @@ const AppHome: React.FC = () => {
 
   // Add a header click handler that resets to intro phase
   const handleTitleClick = () => setPhase("intro");
+
+  const start = () => setPhase("experiment");
+  const goToAdmin = () => setPhase("admin");
+  const handleAdminLogin = () => setPhase("admin-panel");
+  const handleAdminLogout = () => setPhase("intro");
 
   return (
     <div className="cute-ocean-bg flex flex-col items-center px-2 lg:px-0">
