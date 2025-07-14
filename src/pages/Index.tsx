@@ -411,18 +411,6 @@ const AppHome: React.FC = () => {
                   <b className="text-blue-900">Your task:</b> Count how many perceptually distinct color segments (visible divisions) you can spot—even if the colors seem very similar!
                 </li>
                 <li>
-                  Colors always move smoothly from{" "}
-                  <span className="font-medium text-blue-800">dark blue</span>
-                  {" → "}
-                  <span className="font-medium text-blue-600">blue</span>
-                  {" → "}
-                  <span className="font-medium text-blue-400">pale blue</span>
-                  {" → "}
-                  <span className="font-medium text-blue-300">light blue</span>
-                  {" → "}
-                  <span className="font-semibold text-blue-900">white</span>.
-                </li>
-                <li>
                   Some trials use <span className="text-blue-400/70">very subtle gradients</span>; others use sharper divisions—watch for both!
                 </li>
               </ul>
