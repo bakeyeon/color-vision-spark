@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { type KoreanBlueCategory, getRandomKoreanBlueCategory } from "@/lib/gradient-utils";
 
 interface TrialResult {
   trial: number;
@@ -12,7 +13,8 @@ interface TrialResult {
   duration: number;
   subtle: boolean;
   level: number; // 1=easiest, 2=subtle, 3=super subtle
-  colorEnd: [number, number, number]; // RGB endpoint for the bar
+  colorEnd?: [number, number, number]; // RGB endpoint for the bar (optional for Korean categories)
+  category: KoreanBlueCategory;
 }
 
 const TRIALS_COUNT = 12;
@@ -26,12 +28,20 @@ const INTERMEDIATE_ENDPOINTS: [number, number, number][] = [
   [170, 205, 244], // Pastel blue
 ];
 
-// Generate a gradient endpoint that’s always “between blue and white”
-function randomEndpoint(): [number, number, number] {
-  const r = Math.random();
-  if (r < 0.2) return BASE_BLUE;
-  if (r < 0.5) return INTERMEDIATE_ENDPOINTS[Math.floor(Math.random() * INTERMEDIATE_ENDPOINTS.length)];
-  return WHITE;
+// Generate Korean blue category trials 
+function getKoreanBlueTrialConfig(): { category: KoreanBlueCategory; colorEnd?: [number, number, number] } {
+  const category = getRandomKoreanBlueCategory();
+  
+  // For Korean blue categories, we don't need colorEnd as it's defined by the category
+  // For traditional mode, occasionally use original endpoints
+  if (Math.random() < 0.2) {
+    const r = Math.random();
+    if (r < 0.3) return { category: 'traditional', colorEnd: BASE_BLUE };
+    if (r < 0.6) return { category: 'traditional', colorEnd: INTERMEDIATE_ENDPOINTS[Math.floor(Math.random() * INTERMEDIATE_ENDPOINTS.length)] };
+    return { category: 'traditional', colorEnd: WHITE };
+  }
+  
+  return { category };
 }
 
 function randomInt(min: number, max: number) {
@@ -58,14 +68,18 @@ function generateTrialSet() {
     const j = Math.floor(Math.random() * (i + 1));
     [configs[i], configs[j]] = [configs[j], configs[i]];
   }
-  // Map to structure
-  return configs.map(([minB, maxB, subtle, level], i) => ({
-    trial: i + 1,
-    numBlocks: randomInt(minB, maxB),
-    subtle: subtle,
-    level: level,
-    colorEnd: randomEndpoint(),
-  }));
+  // Map to structure with Korean blue categories
+  return configs.map(([minB, maxB, subtle, level], i) => {
+    const { category, colorEnd } = getKoreanBlueTrialConfig();
+    return {
+      trial: i + 1,
+      numBlocks: randomInt(minB, maxB),
+      subtle: subtle,
+      level: level,
+      colorEnd: colorEnd,
+      category: category,
+    };
+  });
 }
 
 interface ExperimentPanelProps {
@@ -127,7 +141,8 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       estimate,
       duration: (trialEnd - (trialStart ?? trialEnd)) / 1000,
       level: tCfg.level,
-      colorEnd: tCfg.colorEnd, // Should always be [number, number, number]
+      colorEnd: tCfg.colorEnd,
+      category: tCfg.category,
     };
 
     const updatedAnswers = [...answers, result];
@@ -158,6 +173,7 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
       duration: 0,
       level: tCfg.level,
       colorEnd: tCfg.colorEnd,
+      category: tCfg.category,
     };
 
     const updatedAnswers = [...answers, result];
@@ -179,6 +195,22 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
 
   const current = trials[trialIdx];
 
+  // Get category description for user
+  const getCategoryDescription = (category: KoreanBlueCategory) => {
+    switch (category) {
+      case 'blue-cyan':
+        return "Blue transitioning toward cyan/teal (blue + green boundary)";
+      case 'blue-violet':
+        return "Blue transitioning toward violet/purple (blue + red boundary)";
+      case 'blue-sky':
+        return "Blue transitioning toward sky blue (blue + white)";
+      case 'blue-navy':
+        return "Blue transitioning toward navy (blue + black)";
+      default:
+        return "Traditional blue to white/pale blue gradient";
+    }
+  };
+
   return (
     <Card className="max-w-3xl w-full mx-auto mt-8 shadow-xl border-2">
       <CardHeader>
@@ -197,8 +229,8 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
             <span>Very subtle, almost seamless color transitions. Most challenging!</span>
           )}
           <div className="text-xs mt-1">
-            <span className="font-semibold">Note:</span>{" "}
-            Gradient may end at blue, white, or a pale/pastel blue.
+            <span className="font-semibold">Color Category:</span>{" "}
+            {getCategoryDescription(current.category)}
           </div>
         </div>
       </CardHeader>
@@ -207,6 +239,7 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
           numBlocks={current.numBlocks}
           subtle={current.subtle}
           colorEnd={current.colorEnd}
+          category={current.category}
           className={current.subtle ? "border-none shadow-none" : ""}
           totalWidth={600}
         />

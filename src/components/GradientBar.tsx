@@ -1,6 +1,6 @@
 
 import React from "react";
-import { getGradientColors } from "@/lib/gradient-utils";
+import { getGradientColors, type KoreanBlueCategory } from "@/lib/gradient-utils";
 
 interface GradientBarProps {
   numBlocks: number;
@@ -8,6 +8,7 @@ interface GradientBarProps {
   totalWidth?: number;
   className?: string;
   colorEnd?: [number, number, number]; // RGB endpoint
+  category?: KoreanBlueCategory; // Korean blue perception category
 }
 
 function randomWidths(numBlocks: number, total: number): number[] {
@@ -40,8 +41,9 @@ const GradientBar: React.FC<GradientBarProps> = ({
   totalWidth = 600,
   className = "",
   colorEnd,
+  category,
 }) => {
-  const colors = getGradientColors(numBlocks, colorEnd);
+  const colors = getGradientColors(numBlocks, colorEnd, category);
   const widths = React.useMemo(() => randomWidths(numBlocks, totalWidth), [numBlocks, totalWidth]);
 
   return (
