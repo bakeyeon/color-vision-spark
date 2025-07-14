@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
+import ColorVocabularyTest, { ColorVocabularyData } from "@/components/ColorVocabularyTest";
 import AdminLogin from "@/components/AdminLogin";
 import AdminPanel from "@/components/AdminPanel";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
@@ -154,9 +155,10 @@ function getClosestFish(userGroup: number): [typeof fishList[0], typeof fishList
 }
 
 const AppHome: React.FC = () => {
-  // Phases: intro -> experiment -> questionnaire -> summary -> admin
-  const [phase, setPhase] = useState<"intro" | "experiment" | "questionnaire" | "summary" | "admin" | "admin-panel">("intro");
+  // Phases: intro -> experiment -> vocabulary -> questionnaire -> summary -> admin
+  const [phase, setPhase] = useState<"intro" | "experiment" | "vocabulary" | "questionnaire" | "summary" | "admin" | "admin-panel">("intro");
   const [results, setResults] = useState<TrialResult[]>([]);
+  const [colorVocabulary, setColorVocabulary] = useState<ColorVocabularyData | null>(null);
   const [demographics, setDemographics] = useState<QuestionnaireData | null>(null);
 
   const [skipCount, setSkipCount] = useState(0);
@@ -164,10 +166,21 @@ const AppHome: React.FC = () => {
   // Check if admin is already logged in
   const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
 
-  // After experiment, go directly to questionnaire
+  // After experiment, go to color vocabulary test
   const handleExperimentComplete = (res: TrialResult[], skips: number) => {
     setResults(res);
     setSkipCount(skips);
+    setPhase("vocabulary");
+  };
+
+  // After color vocabulary test, go to questionnaire
+  const handleColorVocabulary = (data: ColorVocabularyData) => {
+    setColorVocabulary(data);
+    setPhase("questionnaire");
+  };
+
+  // Skip color vocabulary test and go directly to questionnaire
+  const handleSkipVocabulary = () => {
     setPhase("questionnaire");
   };
 
@@ -439,6 +452,13 @@ const AppHome: React.FC = () => {
 
         {phase === "experiment" && (
           <ExperimentPanel onComplete={handleExperimentComplete} />
+        )}
+
+        {phase === "vocabulary" && (
+          <ColorVocabularyTest 
+            onComplete={handleColorVocabulary}
+            onSkip={handleSkipVocabulary}
+          />
         )}
 
         {phase === "questionnaire" && (
