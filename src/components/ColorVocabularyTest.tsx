@@ -3,8 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import GradientBar from "@/components/GradientBar";
-import { getRandomKoreanBlueCategory } from "@/lib/gradient-utils";
+import { getRandomKoreanBlueCategory, getGradientColors } from "@/lib/gradient-utils";
 
 export interface ColorVocabularyData {
   startPoint: string;
@@ -26,8 +25,17 @@ const ColorVocabularyTest: React.FC<ColorVocabularyTestProps> = ({
   const [middlePoint, setMiddlePoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
   
-  // Generate a random gradient category for this test
+  // Generate a random gradient category and 3 random colors for this test
   const [category] = useState(() => getRandomKoreanBlueCategory());
+  const [colors] = useState(() => {
+    // Generate 3 random colors from different positions in the gradient
+    const gradientColors = getGradientColors(20, undefined, category);
+    return [
+      gradientColors[0], // start
+      gradientColors[Math.floor(gradientColors.length / 2)], // middle
+      gradientColors[gradientColors.length - 1] // end
+    ];
+  });
 
   const exampleWords = [
     "azure", "navy", "cobalt", "sky blue", "royal blue", 
@@ -60,28 +68,28 @@ const ColorVocabularyTest: React.FC<ColorVocabularyTestProps> = ({
             Color Vocabulary Test
           </CardTitle>
           <p className="text-muted-foreground mt-2">
-            Describe the colors you see in this gradient using your own words
+            Describe the colors you see using your own words
           </p>
         </CardHeader>
         
         <CardContent className="space-y-6 p-6">
-          {/* Gradient Display */}
+          {/* Color Display */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-foreground">
-              Color Gradient
+              Colors
             </h3>
-            <div className="flex justify-center">
-              <GradientBar 
-                numBlocks={12} 
-                totalWidth={600} 
-                category={category}
-                className="mx-auto"
-              />
-            </div>
-            <div className="flex justify-between text-sm text-muted-foreground px-4">
-              <span>Start</span>
-              <span>Middle</span>
-              <span>End</span>
+            <div className="flex justify-center gap-8">
+              {colors.map((color, index) => (
+                <div key={index} className="flex flex-col items-center space-y-2">
+                  <div 
+                    className="w-24 h-24 rounded-lg border-2 border-border shadow-md"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {index === 0 ? 'First Color' : index === 1 ? 'Second Color' : 'Third Color'}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -106,11 +114,11 @@ const ColorVocabularyTest: React.FC<ColorVocabularyTestProps> = ({
           <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="startPoint" className="text-foreground font-medium">
-                Start Point Color
+                First Color
               </Label>
               <Textarea
                 id="startPoint"
-                placeholder="Describe the leftmost color..."
+                placeholder="Describe the first color..."
                 value={startPoint}
                 onChange={(e) => setStartPoint(e.target.value)}
                 className="min-h-[100px] resize-none"
@@ -119,11 +127,11 @@ const ColorVocabularyTest: React.FC<ColorVocabularyTestProps> = ({
             
             <div className="space-y-2">
               <Label htmlFor="middlePoint" className="text-foreground font-medium">
-                Middle Point Color
+                Second Color
               </Label>
               <Textarea
                 id="middlePoint"
-                placeholder="Describe the middle color..."
+                placeholder="Describe the second color..."
                 value={middlePoint}
                 onChange={(e) => setMiddlePoint(e.target.value)}
                 className="min-h-[100px] resize-none"
@@ -132,11 +140,11 @@ const ColorVocabularyTest: React.FC<ColorVocabularyTestProps> = ({
             
             <div className="space-y-2">
               <Label htmlFor="endPoint" className="text-foreground font-medium">
-                End Point Color
+                Third Color
               </Label>
               <Textarea
                 id="endPoint"
-                placeholder="Describe the rightmost color..."
+                placeholder="Describe the third color..."
                 value={endPoint}
                 onChange={(e) => setEndPoint(e.target.value)}
                 className="min-h-[100px] resize-none"
