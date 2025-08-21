@@ -176,6 +176,8 @@ const AppHome: React.FC = () => {
   // After color vocabulary test, go to questionnaire
   const handleColorVocabulary = (data: ColorVocabularyData) => {
     setColorVocabulary(data);
+    // Store color vocabulary data in localStorage for later retrieval
+    localStorage.setItem("colorVocabularyData", JSON.stringify(data));
     setPhase("questionnaire");
   };
 

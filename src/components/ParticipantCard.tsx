@@ -11,6 +11,7 @@ import { type TrialResult } from "./ExperimentPanel";
 interface StoredData {
   questionnaire: QuestionnaireData | null;
   experiment: TrialResult[] | null;
+  colorVocabulary?: any | null;
   submitted_at: string;
   page_url: string;
 }
@@ -42,6 +43,18 @@ const ParticipantCard: React.FC<Props> = ({ entry, index, onDelete }) => (
             <div><strong>Media Type:</strong> {entry.questionnaire.mediaType}</div>
             <div><strong>Media Kind:</strong> {entry.questionnaire.mediaKind}</div>
             <div><strong>Media Hours:</strong> {entry.questionnaire.mediaHours}</div>
+          </div>
+        </div>
+      )}
+
+      {entry.colorVocabulary && (
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Color Vocabulary Data:</h3>
+          <div className="grid grid-cols-1 gap-2 text-sm">
+            <div><strong>First Color:</strong> {entry.colorVocabulary.startPoint || 'Not provided'}</div>
+            <div><strong>Second Color:</strong> {entry.colorVocabulary.middlePoint || 'Not provided'}</div>
+            <div><strong>Third Color:</strong> {entry.colorVocabulary.endPoint || 'Not provided'}</div>
+            <div><strong>Category:</strong> {entry.colorVocabulary.category || 'Not provided'}</div>
           </div>
         </div>
       )}

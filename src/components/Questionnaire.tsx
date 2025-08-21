@@ -96,13 +96,17 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     }
     setSubmitting(true);
 
-    // Combine questionnaire with experiment data, accumulate in array
+    // Combine questionnaire with experiment data and color vocabulary, accumulate in array
     const storedResults = localStorage.getItem("experimentResults");
     const experimentResults: TrialResult[] | null = storedResults ? JSON.parse(storedResults) : null;
+    
+    const storedColorVocab = localStorage.getItem("colorVocabularyData");
+    const colorVocabularyResults = storedColorVocab ? JSON.parse(storedColorVocab) : null;
 
     const dataToSave = {
       questionnaire: form,
       experiment: experimentResults,
+      colorVocabulary: colorVocabularyResults,
       submitted_at: new Date().toISOString(),
       page_url: window.location.href
     };
