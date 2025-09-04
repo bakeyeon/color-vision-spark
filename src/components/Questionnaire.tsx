@@ -34,7 +34,8 @@ const yearsOpts = [
   "more than 20"
 ];
 
-const ZAPIER_WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/23386005/uyvi4ck/";
+// Google Apps Script 웹앱 URL - 본인의 GAS 웹앱 URL로 교체해주세요
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/{YOUR_SCRIPT_ID}/exec";
 
 const Questionnaire: React.FC<Props> = ({ onComplete }) => {
   const [form, setForm] = useState<Partial<QuestionnaireData>>({});
@@ -47,39 +48,39 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     setForm(prev => ({ ...prev, [key]: value }));
   };
 
-  const sendToZapier = async (data: QuestionnaireData) => {
+  const sendToGoogleSheets = async (data: QuestionnaireData) => {
     const storedResults = localStorage.getItem("experimentResults");
     const experimentResults: TrialResult[] | null = storedResults ? JSON.parse(storedResults) : null;
+    
+    const storedColorVocab = localStorage.getItem("colorVocabularyData");
+    const colorVocabularyResults = storedColorVocab ? JSON.parse(storedColorVocab) : null;
 
     try {
-      const response = await fetch(ZAPIER_WEBHOOK_URL, {
+      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
+        mode: "no-cors", // Google Apps Script requires no-cors
         body: JSON.stringify({
           questionnaire: data,
           experiment: experimentResults,
+          colorVocabulary: colorVocabularyResults,
           submitted_at: new Date().toISOString(),
           page_url: window.location.href
         })
       });
 
-      // Check if the response is ok (status 200-299)
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      console.log("Data successfully sent to Zapier");
+      console.log("Data successfully sent to Google Sheets");
       toast({
         title: "Survey Submitted!",
-        description: "Your responses were sent to the researcher successfully.",
+        description: "Your responses were sent to Google Sheets successfully.",
       });
     } catch (err) {
-      console.error("Error sending to Zapier:", err);
+      console.error("Error sending to Google Sheets:", err);
       toast({
         variant: "destructive",
-        title: "Failed to send data to researcher.",
+        title: "Failed to send data to Google Sheets.",
         description: "Please check your internet connection and try again.",
       });
       throw err;
@@ -126,8 +127,8 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     localStorage.setItem("experimentDataset", JSON.stringify(dataset));
 
     try {
-      // Try to send data to Zapier (Google Sheets)
-      await sendToZapier(form as QuestionnaireData);
+      // Try to send data to Google Sheets
+      await sendToGoogleSheets(form as QuestionnaireData);
 
       setTimeout(() => {
         setSubmitting(false);
