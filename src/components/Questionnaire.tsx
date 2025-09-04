@@ -34,8 +34,8 @@ const yearsOpts = [
   "more than 20"
 ];
 
-// Google Apps Script 웹앱 URL - 본인의 GAS 웹앱 URL로 교체해주세요
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/{YOUR_SCRIPT_ID}/exec";
+// Google Apps Script 웹앱 URL
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVgRCzvDu0kcNcnEYyjCVytVQDifjj41LinJ3IrojQU9UI-Q1GcUJryXO8z-GZlZcI/exec";
 
 const Questionnaire: React.FC<Props> = ({ onComplete }) => {
   const [form, setForm] = useState<Partial<QuestionnaireData>>({});
