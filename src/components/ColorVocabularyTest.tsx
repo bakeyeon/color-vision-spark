@@ -25,15 +25,14 @@ const ColorVocabularyTest: React.FC<ColorVocabularyTestProps> = ({
   const [middlePoint, setMiddlePoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
   
-  // Generate a random gradient category and 3 random colors for this test
+  // Fixed colors for the test
   const [category] = useState(() => getRandomKoreanBlueCategory());
   const [colors] = useState(() => {
-    // Generate 3 random colors from different positions in the gradient
-    const gradientColors = getGradientColors(20, undefined, category);
+    // Use fixed hex colors as requested
     return [
-      gradientColors[0], // start
-      gradientColors[Math.floor(gradientColors.length / 2)], // middle
-      gradientColors[gradientColors.length - 1] // end
+      "#0000FF", // blue
+      "#008000", // green
+      "#008080"  // dark cyan/teal
     ];
   });
 
