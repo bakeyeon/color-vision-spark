@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
 import ColorVocabularyTest, { ColorVocabularyData } from "@/components/ColorVocabularyTest";
+import ColorEmotionTest, { ColorEmotionData } from "@/components/ColorEmotionTest";
 import AdminLogin from "@/components/AdminLogin";
 import AdminPanel from "@/components/AdminPanel";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
@@ -155,10 +156,11 @@ function getClosestFish(userGroup: number): [typeof fishList[0], typeof fishList
 }
 
 const AppHome: React.FC = () => {
-  // Phases: intro -> experiment -> vocabulary -> questionnaire -> summary -> admin
-  const [phase, setPhase] = useState<"intro" | "experiment" | "vocabulary" | "questionnaire" | "summary" | "admin" | "admin-panel">("intro");
+  // Phases: intro -> experiment -> vocabulary -> emotion -> questionnaire -> summary -> admin
+  const [phase, setPhase] = useState<"intro" | "experiment" | "vocabulary" | "emotion" | "questionnaire" | "summary" | "admin" | "admin-panel">("intro");
   const [results, setResults] = useState<TrialResult[]>([]);
   const [colorVocabulary, setColorVocabulary] = useState<ColorVocabularyData | null>(null);
+  const [colorEmotion, setColorEmotion] = useState<ColorEmotionData | null>(null);
   const [demographics, setDemographics] = useState<QuestionnaireData | null>(null);
 
   const [skipCount, setSkipCount] = useState(0);
@@ -173,16 +175,29 @@ const AppHome: React.FC = () => {
     setPhase("vocabulary");
   };
 
-  // After color vocabulary test, go to questionnaire
+  // After color vocabulary test, go to color emotion test
   const handleColorVocabulary = (data: ColorVocabularyData) => {
     setColorVocabulary(data);
     // Store color vocabulary data in localStorage for later retrieval
     localStorage.setItem("colorVocabularyData", JSON.stringify(data));
+    setPhase("emotion");
+  };
+
+  // Skip color vocabulary test and go directly to emotion test
+  const handleSkipVocabulary = () => {
+    setPhase("emotion");
+  };
+
+  // After color emotion test, go to questionnaire
+  const handleColorEmotion = (data: ColorEmotionData) => {
+    setColorEmotion(data);
+    // Store color emotion data in localStorage for later retrieval
+    localStorage.setItem("colorEmotionData", JSON.stringify(data));
     setPhase("questionnaire");
   };
 
-  // Skip color vocabulary test and go directly to questionnaire
-  const handleSkipVocabulary = () => {
+  // Skip color emotion test and go directly to questionnaire
+  const handleSkipEmotion = () => {
     setPhase("questionnaire");
   };
 
@@ -460,6 +475,13 @@ const AppHome: React.FC = () => {
           <ColorVocabularyTest 
             onComplete={handleColorVocabulary}
             onSkip={handleSkipVocabulary}
+          />
+        )}
+
+        {phase === "emotion" && (
+          <ColorEmotionTest 
+            onComplete={handleColorEmotion}
+            onSkip={handleSkipEmotion}
           />
         )}
 
