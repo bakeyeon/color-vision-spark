@@ -5,18 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 // Images imported as ES6 modules
-import blue1 from "/public/lovable-uploads/0caba236-82e1-45e5-a081-24f26810215c.png";
-import blue2 from "/public/lovable-uploads/23c0dc77-72e1-4330-a98a-18e6c0840a0f.png";
-import blue3 from "/public/lovable-uploads/42080f31-1dc3-46d3-83e8-de77bd06332e.png";
-import blue4 from "/public/lovable-uploads/b691cecb-1e89-47a4-b1eb-64f1e16d5af9.png";
-import blue5 from "/public/lovable-uploads/25c2fd9f-0ab1-42c9-b745-7a0a0bfa4ad0.png";
-import blue6 from "/public/lovable-uploads/e26bfb14-8e4e-4443-8c3d-dd97417845f2.png";
-import green1 from "/public/lovable-uploads/536357f8-45d2-42fa-a4af-2f196fe6502c.png";
-import green2 from "/public/lovable-uploads/75d9f402-7c5d-4783-b206-fc671a76ab44.png";
-import green3 from "/public/lovable-uploads/8910f02a-ea52-4f93-880a-6bba100b2626.png";
-import teal1 from "/public/lovable-uploads/b1500335-6f2d-4627-b324-094a8502085e.png";
-import teal2 from "/public/lovable-uploads/c03250c9-2e13-4365-b424-ebdb218f9817.png";
-import teal3 from "/public/lovable-uploads/e44668cb-4181-4428-b872-8a64de8c91e1.png";
+import blue1 from "/public/images/blue/blue1.png";
+import blue2 from "/public/images/blue/blue2.png";
+import blue3 from "/public/images/blue/blue3.png";
+import green1 from "/public/images/green/green1.png";
+import green2 from "/public/images/green/green2.png";
+import green3 from "/public/images/green/green3.png";
+import teal1 from "/public/images/teal/teal1.png";
+import teal2 from "/public/images/teal/teal2.png";
+import teal3 from "/public/images/teal/teal3.png";
 export interface ColorEmotionData {
   blueEmotion: string;
   greenEmotion: string;
@@ -40,7 +37,7 @@ const ColorEmotionTest: React.FC<ColorEmotionTestProps> = ({
   const [tealEmotion, setTealEmotion] = useState("");
 
   // Arrays of images for each color category
-  const blueImages = [blue1, blue2, blue3, blue4, blue5, blue6];
+  const blueImages = [blue1, blue2, blue3];
   const greenImages = [green1, green2, green3];
   const tealImages = [teal1, teal2, teal3];
 
