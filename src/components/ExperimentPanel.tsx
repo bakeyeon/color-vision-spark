@@ -17,7 +17,7 @@ interface TrialResult {
   category: KoreanBlueCategory;
 }
 
-const TRIALS_COUNT = 12;
+const TRIALS_COUNT = 6;
 
 const BASE_BLUE: [number, number, number] = [0, 56, 168];
 const WHITE: [number, number, number] = [255, 255, 255];
@@ -54,22 +54,18 @@ function generateTrialSet() {
   const blocksConfig: [number, number, boolean, number][] = [
     [8, 15, false, 1],
     [9, 17, false, 1],
-
     [16, 25, true, 2],
     [15, 22, true, 2],
-
     [20, 30, true, 3],
     [22, 28, true, 3],
   ];
-  // Duplicate to make 12
-  let configs = [...blocksConfig, ...blocksConfig];
   // Shuffle
-  for (let i = configs.length - 1; i > 0; i--) {
+  for (let i = blocksConfig.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [configs[i], configs[j]] = [configs[j], configs[i]];
+    [blocksConfig[i], blocksConfig[j]] = [blocksConfig[j], blocksConfig[i]];
   }
   // Map to structure with Korean blue categories
-  return configs.map(([minB, maxB, subtle, level], i) => {
+  return blocksConfig.map(([minB, maxB, subtle, level], i) => {
     const { category, colorEnd } = getKoreanBlueTrialConfig();
     return {
       trial: i + 1,
