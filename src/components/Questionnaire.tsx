@@ -34,8 +34,6 @@ const yearsOpts = [
   "more than 20"
 ];
 
-// Google Apps Script 웹앱 URL
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVgRCzvDu0kcNcnEYyjCVytVQDifjj41LinJ3IrojQU9UI-Q1GcUJryXO8z-GZlZcI/exec";
 
 const Questionnaire: React.FC<Props> = ({ onComplete }) => {
   const [form, setForm] = useState<Partial<QuestionnaireData>>({});
@@ -48,45 +46,7 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     setForm(prev => ({ ...prev, [key]: value }));
   };
 
-  const sendToGoogleSheets = async (data: QuestionnaireData) => {
-    const storedResults = localStorage.getItem("experimentResults");
-    const experimentResults: TrialResult[] | null = storedResults ? JSON.parse(storedResults) : null;
-    
-    const storedColorVocab = localStorage.getItem("colorVocabularyData");
-    const colorVocabularyResults = storedColorVocab ? JSON.parse(storedColorVocab) : null;
-
-    try {
-      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        mode: "no-cors", // Google Apps Script requires no-cors
-        body: JSON.stringify({
-          questionnaire: data,
-          experiment: experimentResults,
-          colorEmotion: colorEmotionResults,
-          submitted_at: new Date().toISOString(),
-          page_url: window.location.href
-        })
-      });
-
-      console.log("Data successfully sent to Google Sheets");
-      toast({
-        title: "Survey Submitted!",
-        description: "Your responses were sent to Google Sheets successfully.",
-      });
-    } catch (err) {
-      console.error("Error sending to Google Sheets:", err);
-      toast({
-        variant: "destructive",
-        title: "Failed to send data to Google Sheets.",
-        description: "Please check your internet connection and try again.",
-      });
-      throw err;
-    }
-  };
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
@@ -126,28 +86,6 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     dataset.push(dataToSave);
     localStorage.setItem("experimentDataset", JSON.stringify(dataset));
 
-    try {
-      // Try to send data to Google Sheets
-      await sendToGoogleSheets(form as QuestionnaireData);
-
-      setTimeout(() => {
-        setSubmitting(false);
-
-        // Clean up individual keys for future compatibility? (Optional: keep for now)
-        onComplete(form as QuestionnaireData);
-      }, 400);
-    } catch (error) {
-      toast({
-        title: "Data Saved Locally",
-        description: "Your responses are saved and can be accessed by the researcher.",
-      });
-      
-      setTimeout(() => {
-        setSubmitting(false);
-        onComplete(form as QuestionnaireData);
-      }, 400);
-    }
-  };
 
   return (
     <Card className="max-w-lg w-full mx-auto my-10 shadow-lg">
