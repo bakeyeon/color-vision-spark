@@ -1,13 +1,40 @@
-// Simple password management for admin panel
-const DEFAULT_PASSWORD = "admin456";
-const PASSWORD_KEY = "adminPassword";
 
-export function getStoredPassword(): string {
-  // Try to get from localStorage, fallback to default
-  const stored = localStorage.getItem(PASSWORD_KEY);
-  return stored || DEFAULT_PASSWORD;
-}
+// Simple encryption utility for password storage
+const ENCRYPTION_KEY = 'lovable-admin-key-2024';
 
-export function setStoredPassword(newPassword: string): void {
-  localStorage.setItem(PASSWORD_KEY, newPassword);
-}
+export const encryptPassword = (password: string): string => {
+  // Simple XOR encryption with base64 encoding
+  let encrypted = '';
+  for (let i = 0; i < password.length; i++) {
+    const charCode = password.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length);
+    encrypted += String.fromCharCode(charCode);
+  }
+  return btoa(encrypted);
+};
+
+export const decryptPassword = (encryptedPassword: string): string => {
+  try {
+    const decoded = atob(encryptedPassword);
+    let decrypted = '';
+    for (let i = 0; i < decoded.length; i++) {
+      const charCode = decoded.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length);
+      decrypted += String.fromCharCode(charCode);
+    }
+    return decrypted;
+  } catch {
+    return '';
+  }
+};
+
+export const getStoredPassword = (): string => {
+  const stored = localStorage.getItem('adminPassword');
+  if (stored) {
+    return decryptPassword(stored);
+  }
+  return 'admin123'; // Default password
+};
+
+export const setStoredPassword = (password: string): void => {
+  const encrypted = encryptPassword(password);
+  localStorage.setItem('adminPassword', encrypted);
+};

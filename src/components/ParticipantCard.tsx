@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -47,8 +48,6 @@ const ParticipantCard: React.FC<Props> = ({ entry, index, onDelete }) => (
         </div>
       )}
 
-      {/* Commented out Color Vocabulary section */}
-      {/*
       {entry.colorVocabulary && (
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Color Vocabulary Data:</h3>
@@ -60,7 +59,6 @@ const ParticipantCard: React.FC<Props> = ({ entry, index, onDelete }) => (
           </div>
         </div>
       )}
-      */}
 
       {entry.colorEmotion && (
         <div className="mb-4">
