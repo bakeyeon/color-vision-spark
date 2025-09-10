@@ -48,17 +48,17 @@ const ParticipantCard: React.FC<Props> = ({ entry, index, onDelete }) => (
         </div>
       )}
 
-      {entry.colorVocabulary && (
-        <div className="mb-4">
-          <h3 className="font-semibold mb-2">Color Vocabulary Data:</h3>
-          <div className="grid grid-cols-1 gap-2 text-sm">
-            <div><strong>First Color:</strong> {entry.colorVocabulary.startPoint || 'Not provided'}</div>
-            <div><strong>Second Color:</strong> {entry.colorVocabulary.middlePoint || 'Not provided'}</div>
-            <div><strong>Third Color:</strong> {entry.colorVocabulary.endPoint || 'Not provided'}</div>
-            <div><strong>Category:</strong> {entry.colorVocabulary.category || 'Not provided'}</div>
-          </div>
-        </div>
-      )}
+//      {entry.colorVocabulary && (
+//        <div className="mb-4">
+//          <h3 className="font-semibold mb-2">Color Vocabulary Data:</h3>
+//          <div className="grid grid-cols-1 gap-2 text-sm">
+//            <div><strong>First Color:</strong> {entry.colorVocabulary.startPoint || 'Not provided'}</div>
+//            <div><strong>Second Color:</strong> {entry.colorVocabulary.middlePoint || 'Not provided'}</div>
+//            <div><strong>Third Color:</strong> {entry.colorVocabulary.endPoint || 'Not provided'}</div>
+//            <div><strong>Category:</strong> {entry.colorVocabulary.category || 'Not provided'}</div>
+//          </div>
+//        </div>
+//      )}
 
       {entry.colorEmotion && (
         <div className="mb-4">
