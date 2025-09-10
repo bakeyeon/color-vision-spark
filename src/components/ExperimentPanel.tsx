@@ -285,5 +285,62 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
   );
 };
 
+// -----------------------------------------------------------editing(for saving in spreadsheet)--------------------------------------
+
+const ExperimentPage = () => {
+    const [isCompleted, setIsCompleted] = useState(false);
+    const [results, setResults] = useState<TrialResult[]>([]);
+
+    // Google Apps Script URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpJFAKBUcBhmVVcy6JeM7SQYLsvjV6Hc7zyhX3JgdyHq2NYsdL-2AhBuEUi7QP-CT-/exec";
+
+    const handleExperimentComplete = async (experimentResults: TrialResult[], skips: number) => {
+        console.log("Experiment complete! Results:", experimentResults);
+        setResults(experimentResults);
+        setIsCompleted(true);
+
+        const payload = {
+            submitted_at: new Date().toISOString(),
+            experiment: experimentResults,
+        };
+
+        console.log("Sending payload to Google Apps Script:", payload);
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                redirect: 'follow',
+                body: JSON.stringify(payload)
+            });
+            console.log("Data sent successfully!");
+            alert("Your responses have been successfully submitted. Thank you!");
+
+        } catch (error) {
+            console.error("Error sending data to Google Apps Script:", error);
+            alert("An error occurred while submitting your responses. Please try again.");
+        }
+    };
+
+    if (isCompleted) {
+        return (
+            <div className="text-center p-8">
+                <h1 className="text-2xl font-bold mb-4">Thank you for your participation!</h1>
+                <p>Your results have been submitted.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-4 bg-gray-50 min-h-screen">
+            <ExperimentPanel onComplete={handleExperimentComplete} />
+        </div>
+    );
+};
+
+
 export type { TrialResult };
 export default ExperimentPanel;
