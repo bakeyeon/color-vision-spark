@@ -292,7 +292,7 @@ const ExperimentPage = () => {
     const [results, setResults] = useState<TrialResult[]>([]);
 
     // Google Apps Script URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpJFAKBUcBhmVVcy6JeM7SQYLsvjV6Hc7zyhX3JgdyHq2NYsdL-2AhBuEUi7QP-CT-/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby53liBMBcRC9YnKen9YGw-2QoApOwQwWJqudSM9NM1B6P2pHb9121CMxG6ACz1i-O9/exec";
 
     const handleExperimentComplete = async (experimentResults: TrialResult[], skips: number) => {
         console.log("Experiment complete! Results:", experimentResults);
