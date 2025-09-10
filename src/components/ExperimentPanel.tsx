@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { type KoreanBlueCategory, getRandomKoreanBlueCategory } from "@/lib/gradient-utils";
 import ColorEmotionTest, { type ColorEmotionData } from "./ColorEmotionTest";
+import ColorVocabularyTest, { type ColorVocabularyData } from "./ColorVocabularyTest";
+import Questionnaire, { type QuestionnaireData } from "./Questionnaire";
 
 export interface TrialResult {
   trial: number;
@@ -296,68 +298,118 @@ interface ExperimentPageProps {
 }
 
 const ExperimentPage: React.FC<ExperimentPageProps> = ({ onComplete }) => {
-  // 'experiment', 'emotion', 'completed' 상태를 관리합니다.
-  const [currentStep, setCurrentStep] = useState<'experiment' | 'emotion' | 'completed'>('experiment');
+  // 4-step process: questionnaire -> perception -> vocabulary -> emotion -> completed
+  const [currentStep, setCurrentStep] = useState<'questionnaire' | 'perception' | 'vocabulary' | 'emotion' | 'completed'>('questionnaire');
   
-  // 각 테스트의 결과를 저장할 state
+  // All test results storage
+  const [questionnaireData, setQuestionnaireData] = useState<QuestionnaireData | null>(null);
   const [perceptionResults, setPerceptionResults] = useState<TrialResult[]>([]);
+  const [vocabularyData, setVocabularyData] = useState<ColorVocabularyData | null>(null);
   const [emotionResults, setEmotionResults] = useState<ColorEmotionData | null>(null);
 
-  // Save data to localStorage and call parent completion handler
-  const saveDataLocally = (experimentData: TrialResult[], emotionData: ColorEmotionData | null) => {
-    // Get existing dataset
-    const datasetRaw = localStorage.getItem("experimentDataset");
-    let dataset: any[] = [];
-    if (datasetRaw) {
-      try {
-        dataset = JSON.parse(datasetRaw);
-      } catch {
-        dataset = [];
-      }
-    }
+  const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVgRCzvDu0kcNcnEYyjCVytVQDifjj41LinJ3IrojQU9UI-Q1GcUJryXO8z-GZlZcI/exec";
 
-    // Add new entry
-    const newEntry = {
-      experiment: experimentData,
-      colorEmotion: emotionData,
+  // Submit all data to Google Spreadsheet
+  const submitAllData = async (emotionData: ColorEmotionData | null) => {
+    const payload = {
       submitted_at: new Date().toISOString(),
+      questionnaire: questionnaireData,
+      experiment: perceptionResults,
+      colorVocabulary: vocabularyData,
+      colorEmotion: emotionData,
       page_url: window.location.href
     };
 
-    dataset.push(newEntry);
-    localStorage.setItem("experimentDataset", JSON.stringify(dataset));
-    
-    // Call parent completion handler
-    if (onComplete) {
-      onComplete(experimentData, 0); // Pass results to parent (Index.tsx)
+    console.log("Sending FINAL 4-PART payload:", JSON.stringify(payload, null, 2));
+
+    try {
+      // Save to localStorage for admin panel
+      const datasetRaw = localStorage.getItem("experimentDataset");
+      let dataset: any[] = [];
+      if (datasetRaw) {
+        try {
+          dataset = JSON.parse(datasetRaw);
+        } catch {
+          dataset = [];
+        }
+      }
+      dataset.push(payload);
+      localStorage.setItem("experimentDataset", JSON.stringify(dataset));
+
+      // Send to Google Spreadsheet
+      await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      toast({
+        title: "Thank you!",
+        description: "Your submission was successful."
+      });
+    } catch (error) {
+      console.error("Submission Error:", error);
+      toast({
+        variant: "destructive",
+        title: "Submission saved locally",
+        description: "Data saved for researcher access."
+      });
+    } finally {
+      setCurrentStep('completed');
+      // Call parent completion handler
+      if (onComplete) {
+        onComplete(perceptionResults, 0);
+      }
     }
   };
 
-  // 1. 첫 번째 실험(Perception)이 완료됐을 때 호출됩니다.
+  // Step handlers
+  const handleQuestionnaireComplete = (data: QuestionnaireData) => {
+    setQuestionnaireData(data);
+    setCurrentStep('perception');
+  };
+
   const handlePerceptionComplete = (results: TrialResult[], skips: number) => {
     console.log("Perception test complete! Results:", results);
     setPerceptionResults(results);
-    setCurrentStep('emotion'); // 다음 단계(Emotion)로 넘어갑니다.
+    setCurrentStep('vocabulary');
   };
 
-  // 2. 두 번째 실험(Emotion)이 완료됐을 때 호출됩니다.
+  const handleVocabularyComplete = (data: ColorVocabularyData) => {
+    setVocabularyData(data);
+    setCurrentStep('emotion');
+  };
+
+  const handleVocabularySkip = () => {
+    setVocabularyData(null);
+    setCurrentStep('emotion');
+  };
+
   const handleEmotionComplete = (data: ColorEmotionData) => {
     console.log("Emotion test complete! Data:", data);
     setEmotionResults(data);
-    saveDataLocally(perceptionResults, data);
-    setCurrentStep('completed');
+    submitAllData(data);
   };
 
-  // 3. 두 번째 실험(Emotion)을 건너뛸 때 호출됩니다.
   const handleEmotionSkip = () => {
     console.log("Emotion test skipped.");
-    saveDataLocally(perceptionResults, null);
-    setCurrentStep('completed');
+    submitAllData(null);
   };
 
-  // 현재 단계에 따라 다른 컴포넌트를 보여줍니다.
-  if (currentStep === 'experiment') {
+  // Render current step
+  if (currentStep === 'questionnaire') {
+    return <Questionnaire onComplete={handleQuestionnaireComplete} />;
+  }
+
+  if (currentStep === 'perception') {
     return <ExperimentPanel onComplete={handlePerceptionComplete} />;
+  }
+
+  if (currentStep === 'vocabulary') {
+    return <ColorVocabularyTest onComplete={handleVocabularyComplete} onSkip={handleVocabularySkip} />;
   }
   
   if (currentStep === 'emotion') {
