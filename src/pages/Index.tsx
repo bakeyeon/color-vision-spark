@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import ExperimentPage, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
-import ColorVocabularyTest, { ColorVocabularyData } from "@/components/ColorVocabularyTest";
+
 import ColorEmotionTest, { ColorEmotionData } from "@/components/ColorEmotionTest";
 import AdminLogin from "@/components/AdminLogin";
 import AdminPanel from "@/components/AdminPanel";
@@ -156,10 +156,9 @@ function getClosestFish(userGroup: number): [typeof fishList[0], typeof fishList
 }
 
 const AppHome: React.FC = () => {
-  // Phases: intro -> experiment -> vocabulary -> emotion -> questionnaire -> summary -> admin
-  const [phase, setPhase] = useState<"intro" | "experiment" | "vocabulary" | "emotion" | "questionnaire" | "summary" | "admin" | "admin-panel">("intro");
+  // Phases: intro -> experiment -> emotion -> questionnaire -> summary -> admin
+  const [phase, setPhase] = useState<"intro" | "experiment" | "emotion" | "questionnaire" | "summary" | "admin" | "admin-panel">("intro");
   const [results, setResults] = useState<TrialResult[]>([]);
-  const [colorVocabulary, setColorVocabulary] = useState<ColorVocabularyData | null>(null);
   const [colorEmotion, setColorEmotion] = useState<ColorEmotionData | null>(null);
   const [demographics, setDemographics] = useState<QuestionnaireData | null>(null);
 
@@ -168,23 +167,10 @@ const AppHome: React.FC = () => {
   // Check if admin is already logged in
   const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
 
-  // After experiment, go to color vocabulary test
+  // After experiment, go to color emotion test
   const handleExperimentComplete = (res: TrialResult[], skips: number) => {
     setResults(res);
     setSkipCount(skips);
-    setPhase("vocabulary");
-  };
-
-  // After color vocabulary test, go to color emotion test
-  const handleColorVocabulary = (data: ColorVocabularyData) => {
-    setColorVocabulary(data);
-    // Store color vocabulary data in localStorage for later retrieval
-    localStorage.setItem("colorVocabularyData", JSON.stringify(data));
-    setPhase("emotion");
-  };
-
-  // Skip color vocabulary test and go directly to emotion test
-  const handleSkipVocabulary = () => {
     setPhase("emotion");
   };
 
@@ -469,13 +455,6 @@ const AppHome: React.FC = () => {
 
         {phase === "experiment" && (
           <ExperimentPage onComplete={handleExperimentComplete} />
-        )}
-
-        {phase === "vocabulary" && (
-          <ColorVocabularyTest 
-            onComplete={handleColorVocabulary}
-            onSkip={handleSkipVocabulary}
-          />
         )}
 
         {phase === "emotion" && (

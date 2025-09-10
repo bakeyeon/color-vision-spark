@@ -296,80 +296,8 @@ interface ExperimentPageProps {
 }
 
 const ExperimentPage: React.FC<ExperimentPageProps> = ({ onComplete }) => {
-  // 'experiment', 'emotion', 'completed' 상태를 관리합니다.
-  const [currentStep, setCurrentStep] = useState<'experiment' | 'emotion' | 'completed'>('experiment');
-  
-  // 각 테스트의 결과를 저장할 state
-  const [perceptionResults, setPerceptionResults] = useState<TrialResult[]>([]);
-  const [emotionResults, setEmotionResults] = useState<ColorEmotionData | null>(null);
-
-  // Save data to localStorage and call parent completion handler
-  const saveDataLocally = (experimentData: TrialResult[], emotionData: ColorEmotionData | null) => {
-    // Get existing dataset
-    const datasetRaw = localStorage.getItem("experimentDataset");
-    let dataset: any[] = [];
-    if (datasetRaw) {
-      try {
-        dataset = JSON.parse(datasetRaw);
-      } catch {
-        dataset = [];
-      }
-    }
-
-    // Add new entry
-    const newEntry = {
-      experiment: experimentData,
-      colorEmotion: emotionData,
-      submitted_at: new Date().toISOString(),
-      page_url: window.location.href
-    };
-
-    dataset.push(newEntry);
-    localStorage.setItem("experimentDataset", JSON.stringify(dataset));
-    
-    // Call parent completion handler
-    if (onComplete) {
-      onComplete(experimentData, 0); // Pass results to parent (Index.tsx)
-    }
-  };
-
-  // 1. 첫 번째 실험(Perception)이 완료됐을 때 호출됩니다.
-  const handlePerceptionComplete = (results: TrialResult[], skips: number) => {
-    console.log("Perception test complete! Results:", results);
-    setPerceptionResults(results);
-    setCurrentStep('emotion'); // 다음 단계(Emotion)로 넘어갑니다.
-  };
-
-  // 2. 두 번째 실험(Emotion)이 완료됐을 때 호출됩니다.
-  const handleEmotionComplete = (data: ColorEmotionData) => {
-    console.log("Emotion test complete! Data:", data);
-    setEmotionResults(data);
-    saveDataLocally(perceptionResults, data);
-    setCurrentStep('completed');
-  };
-
-  // 3. 두 번째 실험(Emotion)을 건너뛸 때 호출됩니다.
-  const handleEmotionSkip = () => {
-    console.log("Emotion test skipped.");
-    saveDataLocally(perceptionResults, null);
-    setCurrentStep('completed');
-  };
-
-  // 현재 단계에 따라 다른 컴포넌트를 보여줍니다.
-  if (currentStep === 'experiment') {
-    return <ExperimentPanel onComplete={handlePerceptionComplete} />;
-  }
-  
-  if (currentStep === 'emotion') {
-    return <ColorEmotionTest onComplete={handleEmotionComplete} onSkip={handleEmotionSkip} />;
-  }
-  
-  return (
-    <div className="text-center p-8">
-      <h1 className="text-2xl font-bold mb-4">Thank you for your participation!</h1>
-      <p>Your results have been submitted.</p>
-    </div>
-  );
+  // Just return the perception test directly - emotion test is handled in Index.tsx
+  return <ExperimentPanel onComplete={onComplete} />;
 };
 
 
