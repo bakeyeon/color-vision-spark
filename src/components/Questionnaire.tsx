@@ -65,7 +65,7 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
         body: JSON.stringify({
           questionnaire: data,
           experiment: experimentResults,
-          colorVocabulary: colorVocabularyResults,
+          colorEmotion: colorEmotionResults,
           submitted_at: new Date().toISOString(),
           page_url: window.location.href
         })
@@ -101,13 +101,13 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     const storedResults = localStorage.getItem("experimentResults");
     const experimentResults: TrialResult[] | null = storedResults ? JSON.parse(storedResults) : null;
     
-    const storedColorVocab = localStorage.getItem("colorVocabularyData");
-    const colorVocabularyResults = storedColorVocab ? JSON.parse(storedColorVocab) : null;
+    const storedColorEmotion = localStorage.getItem("colorEmotionData");
+    const colorEmotionResults = storedColorEmotion ? JSON.parse(storedColorEmotion) : null;
 
     const dataToSave = {
       questionnaire: form,
       experiment: experimentResults,
-      colorVocabulary: colorVocabularyResults,
+      colorEmotion: colorEmotionResults,
       submitted_at: new Date().toISOString(),
       page_url: window.location.href
     };
