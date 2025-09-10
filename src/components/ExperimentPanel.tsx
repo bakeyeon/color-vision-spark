@@ -285,62 +285,84 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
   );
 };
 
-// -----------------------------------------------------------editing(for saving in spreadsheet)--------------------------------------
+
+
+// --------------------------------------------- Final Edit ------------------------------------------
+
 
 const ExperimentPage = () => {
-    const [isCompleted, setIsCompleted] = useState(false);
-    const [results, setResults] = useState<TrialResult[]>([]);
+  // 'experiment', 'emotion', 'completed' 상태를 관리합니다.
+  const [currentStep, setCurrentStep] = useState<'experiment' | 'emotion' | 'completed'>('experiment');
+  
+  // 각 테스트의 결과를 저장할 state
+  const [perceptionResults, setPerceptionResults] = useState<TrialResult[]>([]);
+  const [emotionResults, setEmotionResults] = useState<ColorEmotionData | null>(null);
 
-    // Google Apps Script URL
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby53liBMBcRC9YnKen9YGw-2QoApOwQwWJqudSM9NM1B6P2pHb9121CMxG6ACz1i-O9/exec";
+  // Google Apps Script URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby53liBMBcRC9YnKen9YGw-2QoApOwQwWJqudSM9NM1B6P2pHb9121CMxG6ACz1i-O9/exec";
 
-    const handleExperimentComplete = async (experimentResults: TrialResult[], skips: number) => {
-        console.log("Experiment complete! Results:", experimentResults);
-        setResults(experimentResults);
-        setIsCompleted(true);
-
-        const payload = {
-            submitted_at: new Date().toISOString(),
-            experiment: experimentResults,
-        };
-
-        console.log("Sending payload to Google Apps Script:", payload);
-
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors', 
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                redirect: 'follow',
-                body: JSON.stringify(payload)
-            });
-            console.log("Data sent successfully!");
-            alert("Your responses have been successfully submitted. Thank you!");
-
-        } catch (error) {
-            console.error("Error sending data to Google Apps Script:", error);
-            alert("An error occurred while submitting your responses. Please try again.");
-        }
+  // 모든 데이터를 최종적으로 서버에 전송하는 함수
+  const submitAllData = async (finalEmotionData: ColorEmotionData | null) => {
+    const payload = {
+      submitted_at: new Date().toISOString(),
+      experiment: perceptionResults, // 첫 번째 테스트 결과
+      colorEmotionTest: finalEmotionData, // 두 번째 테스트 결과
     };
 
-    if (isCompleted) {
-        return (
-            <div className="text-center p-8">
-                <h1 className="text-2xl font-bold mb-4">Thank you for your participation!</h1>
-                <p>Your results have been submitted.</p>
-            </div>
-        );
-    }
+    console.log("Sending FINAL payload to Google Apps Script:", payload);
 
-    return (
-        <div className="p-4 bg-gray-50 min-h-screen">
-            <ExperimentPanel onComplete={handleExperimentComplete} />
-        </div>
-    );
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        redirect: 'follow', body: JSON.stringify(payload)
+      });
+      console.log("Data sent successfully!");
+      alert("Your responses have been successfully submitted. Thank you!");
+    } catch (error) {
+      console.error("Error sending data to Google Apps Script:", error);
+      alert("An error occurred while submitting your responses. Please try again.");
+    } finally {
+      setCurrentStep('completed');
+    }
+  };
+
+  // 1. 첫 번째 실험(Perception)이 완료됐을 때 호출됩니다.
+  const handlePerceptionComplete = (results: TrialResult[], skips: number) => {
+    console.log("Perception test complete! Results:", results);
+    setPerceptionResults(results);
+    setCurrentStep('emotion'); // 다음 단계(Emotion)로 넘어갑니다.
+  };
+
+  // 2. 두 번째 실험(Emotion)이 완료됐을 때 호출됩니다.
+  const handleEmotionComplete = (data: ColorEmotionData) => {
+    console.log("Emotion test complete! Data:", data);
+    setEmotionResults(data);
+    submitAllData(data); // 모든 데이터를 전송합니다.
+  };
+
+  // 3. 두 번째 실험(Emotion)을 건너뛸 때 호출됩니다.
+  const handleEmotionSkip = () => {
+    console.log("Emotion test skipped.");
+    submitAllData(null); // Emotion 데이터 없이 전송합니다.
+  };
+
+  // 현재 단계에 따라 다른 컴포넌트를 보여줍니다.
+  if (currentStep === 'experiment') {
+    return <ExperimentPanel onComplete={handlePerceptionComplete} />;
+  }
+  
+  if (currentStep === 'emotion') {
+    return <ColorEmotionTest onComplete={handleEmotionComplete} onSkip={handleEmotionSkip} />;
+  }
+  
+  return (
+    <div className="text-center p-8">
+      <h1 className="text-2xl font-bold mb-4">Thank you for your participation!</h1>
+      <p>Your results have been submitted.</p>
+    </div>
+  );
 };
 
 
-export type { TrialResult };
 export default ExperimentPanel;
