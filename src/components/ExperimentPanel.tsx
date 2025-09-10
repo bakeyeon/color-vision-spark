@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import GradientBar from "./GradientBar";
 import ColorEmotionTest, { type ColorEmotionData } from "./ColorEmotionTest";
+import Questionnaire, { type QuestionnaireData } from "./Questionnaire";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -57,9 +58,6 @@ function randomInt(min: number, max: number): number {
 
 /**
  * Creates a configuration for a single trial, determining its color category.
- * This function introduces variability by sometimes using traditional gradients
- * instead of the specific Korean blue-green spectrum categories.
- * @returns A trial configuration object.
  */
 function getKoreanBlueTrialConfig(): {
   category: KoreanBlueCategory;
@@ -68,7 +66,6 @@ function getKoreanBlueTrialConfig(): {
   const category = getRandomKoreanBlueCategory();
 
   // For most trials, the category itself defines the gradient.
-  // However, we occasionally mix in a 'traditional' gradient for control/variety.
   if (Math.random() < 0.2) {
     const BASE_BLUE: [number, number, number] = [0, 56, 168];
     const WHITE: [number, number, number] = [255, 255, 255];
@@ -96,8 +93,6 @@ function getKoreanBlueTrialConfig(): {
 
 /**
  * Generates a complete, shuffled set of trials for the perception experiment.
- * Each trial has a defined difficulty, block count, and color category.
- * @returns An array of trial configurations.
  */
 function generateTrialSet(): Omit<TrialResult, "estimate" | "duration">[] {
   // Defines difficulty tiers: [minBlocks, maxBlocks, isSubtle, difficultyLevel]
@@ -131,23 +126,13 @@ function generateTrialSet(): Omit<TrialResult, "estimate" | "duration">[] {
 }
 
 // ============================================================================
-// ExperimentPanel Component
+// ExperimentPanel Component (Color Perception Test)
 // ============================================================================
 
 interface ExperimentPanelProps {
-  /**
-   * Callback function executed when all perception trials are completed.
-   * @param results - An array of results from each trial.
-   * @param skips - The total number of skipped trials.
-   */
   onComplete(results: TrialResult[], skips: number): void;
 }
 
-/**
- * Renders the UI for the color segment counting task.
- * It manages the state for a single trial, including timing, user input,
- * and advancing to the next trial.
- */
 const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
   // State management
   const [trialIdx, setTrialIdx] = useState(0);
@@ -169,8 +154,6 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
 
   /**
    * Finishes the current trial, records the result, and advances to the next step.
-   * If all trials are done, it calls the `onComplete` callback.
-   * @param result - The result object for the current trial.
    */
   const finishTrialAndAdvance = (result: TrialResult) => {
     setTimerOn(false);
@@ -333,13 +316,12 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
 
 /**
  * Manages the entire experiment flow, transitioning between the perception task,
- * the emotion association task, and the completion screen. It is responsible for
- * collecting results from all parts and submitting them.
+ * the emotion association task, and the questionnaire.
  */
 const ExperimentPage: React.FC = () => {
   // State to manage the current step of the experiment
   const [currentStep, setCurrentStep] = useState<
-    "experiment" | "emotion" | "completed"
+    "experiment" | "emotion" | "questionnaire" | "completed"
   >("experiment");
 
   // State to store results from each part of the experiment
@@ -350,7 +332,6 @@ const ExperimentPage: React.FC = () => {
 
   /**
    * Asynchronously submits the final combined data to a Google Apps Script endpoint.
-   * @param payload - The combined data from all experiment parts.
    */
   const submitDataToGoogleScript = async (payload: object) => {
     try {
@@ -366,24 +347,23 @@ const ExperimentPage: React.FC = () => {
       console.log("Data submission request sent successfully!");
     } catch (error) {
       console.error("Error sending data to Google Apps Script:", error);
-      // Optionally, implement a fallback or notify the user
     }
   };
 
   /**
    * Saves the collected data locally and triggers the remote submission.
-   * This function is called after all experiment parts are finished or skipped.
-   * @param experimentData - Results from the perception task.
-   * @param emotionData - Results from the emotion association task.
    */
   const saveDataAndComplete = (
     experimentData: TrialResult[],
-    emotionData: ColorEmotionData | null
+    emotionData: ColorEmotionData | null,
+    questionnaireData: QuestionnaireData
   ) => {
     const finalPayload = {
-      perception_results: experimentData,
-      emotion_results: emotionData,
+      questionnaire: questionnaireData,
+      experiment: experimentData,
+      colorEmotion: emotionData,
       submitted_at: new Date().toISOString(),
+      page_url: window.location.href,
       user_agent: navigator.userAgent,
       screen_resolution: `${window.screen.width}x${window.screen.height}`,
     };
@@ -391,43 +371,53 @@ const ExperimentPage: React.FC = () => {
     // Save data to Google Sheets
     submitDataToGoogleScript(finalPayload);
 
-    // Also save a backup to localStorage
+    // Also save a backup to localStorage in the new format
     const datasetRaw = localStorage.getItem("experimentDataset");
     let dataset: any[] = datasetRaw ? JSON.parse(datasetRaw) : [];
     dataset.push(finalPayload);
     localStorage.setItem("experimentDataset", JSON.stringify(dataset));
+
+    // Store individual components for backward compatibility
+    localStorage.setItem("experimentResults", JSON.stringify(experimentData));
+    localStorage.setItem("colorEmotionData", JSON.stringify(emotionData));
+    localStorage.setItem("questionnaireData", JSON.stringify(questionnaireData));
   };
 
   // === Handlers for transitioning between experiment steps ===
 
   /**
    * 1. Called when the first part (perception test) is completed.
-   * Saves the perception results and advances the state to the emotion test.
    */
   const handlePerceptionComplete = (results: TrialResult[], skips: number) => {
     console.log("Perception test complete! Results:", results, "Skips:", skips);
     setPerceptionResults(results);
-    setCurrentStep("emotion"); // Advance to the next step
+    setCurrentStep("emotion"); // Advance to the emotion test
   };
 
   /**
    * 2. Called when the second part (emotion test) is completed.
-   * Saves the emotion data, triggers the final data submission, and advances to the completed state.
    */
   const handleEmotionComplete = (data: ColorEmotionData) => {
     console.log("Emotion test complete! Data:", data);
     setEmotionResults(data);
-    saveDataAndComplete(perceptionResults, data);
-    setCurrentStep("completed");
+    setCurrentStep("questionnaire"); // Advance to the questionnaire
   };
 
   /**
    * 3. Called when the user skips the emotion test.
-   * Triggers the final data submission with null for emotion data and advances to the completed state.
    */
   const handleEmotionSkip = () => {
     console.log("Emotion test skipped.");
-    saveDataAndComplete(perceptionResults, null);
+    setEmotionResults(null);
+    setCurrentStep("questionnaire"); // Still go to questionnaire
+  };
+
+  /**
+   * 4. Called when the questionnaire is completed.
+   */
+  const handleQuestionnaireComplete = (data: QuestionnaireData) => {
+    console.log("Questionnaire complete! Data:", data);
+    saveDataAndComplete(perceptionResults, emotionResults, data);
     setCurrentStep("completed");
   };
 
@@ -447,6 +437,14 @@ const ExperimentPage: React.FC = () => {
         onComplete={handleEmotionComplete}
         onSkip={handleEmotionSkip}
       />
+    );
+  }
+
+  if (currentStep === "questionnaire") {
+    return (
+      <div className="p-4 bg-gray-50 min-h-screen">
+        <Questionnaire onComplete={handleQuestionnaireComplete} />
+      </div>
     );
   }
 
