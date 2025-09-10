@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import ExperimentPanel, { TrialResult } from "@/components/ExperimentPanel";
+import ExperimentPage, { TrialResult } from "@/components/ExperimentPanel";
 import Questionnaire, { QuestionnaireData } from "@/components/Questionnaire";
 import ColorVocabularyTest, { ColorVocabularyData } from "@/components/ColorVocabularyTest";
 import ColorEmotionTest, { ColorEmotionData } from "@/components/ColorEmotionTest";
@@ -468,7 +468,7 @@ const AppHome: React.FC = () => {
         )}
 
         {phase === "experiment" && (
-          <ExperimentPanel onComplete={handleExperimentComplete} />
+          <ExperimentPage onComplete={handleExperimentComplete} />
         )}
 
         {phase === "vocabulary" && (

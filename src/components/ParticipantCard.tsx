@@ -12,6 +12,7 @@ interface StoredData {
   questionnaire: QuestionnaireData | null;
   experiment: TrialResult[] | null;
   colorVocabulary?: any | null;
+  colorEmotion?: any | null;
   submitted_at: string;
   page_url: string;
 }
@@ -55,6 +56,33 @@ const ParticipantCard: React.FC<Props> = ({ entry, index, onDelete }) => (
             <div><strong>Second Color:</strong> {entry.colorVocabulary.middlePoint || 'Not provided'}</div>
             <div><strong>Third Color:</strong> {entry.colorVocabulary.endPoint || 'Not provided'}</div>
             <div><strong>Category:</strong> {entry.colorVocabulary.category || 'Not provided'}</div>
+          </div>
+        </div>
+      )}
+
+      {entry.colorEmotion && (
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Color Emotion Data:</h3>
+          <div className="grid grid-cols-1 gap-2 text-sm">
+            <div><strong>Blue Emotion:</strong> {entry.colorEmotion.blueEmotion || 'Not provided'}</div>
+            <div><strong>Green Emotion:</strong> {entry.colorEmotion.greenEmotion || 'Not provided'}</div>
+            <div><strong>Teal Emotion:</strong> {entry.colorEmotion.tealEmotion || 'Not provided'}</div>
+            {entry.colorEmotion.selectedImages && (
+              <div className="mt-2">
+                <strong>Selected Images:</strong>
+                <div className="flex gap-2 mt-1">
+                  {entry.colorEmotion.selectedImages.blue && (
+                    <img src={entry.colorEmotion.selectedImages.blue} alt="Blue" className="w-12 h-12 object-cover rounded border" />
+                  )}
+                  {entry.colorEmotion.selectedImages.green && (
+                    <img src={entry.colorEmotion.selectedImages.green} alt="Green" className="w-12 h-12 object-cover rounded border" />
+                  )}
+                  {entry.colorEmotion.selectedImages.teal && (
+                    <img src={entry.colorEmotion.selectedImages.teal} alt="Teal" className="w-12 h-12 object-cover rounded border" />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

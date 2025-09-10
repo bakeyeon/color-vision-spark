@@ -14,6 +14,7 @@ interface StoredData {
   questionnaire: QuestionnaireData | null;
   experiment: TrialResult[] | null;
   colorVocabulary?: any | null;
+  colorEmotion?: any | null;
   submitted_at: string;
   page_url: string;
 }
@@ -62,6 +63,7 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
             questionnaire: entry.questionnaire ?? null,
             experiment: entry.experiment ?? null,
             colorVocabulary: entry.colorVocabulary ?? null,
+            colorEmotion: entry.colorEmotion ?? null,
             submitted_at: entry.submitted_at ?? "",
             page_url: entry.page_url ?? "",
           }));
@@ -78,6 +80,7 @@ const AdminPanel: React.FC<Props> = ({ onLogout }) => {
           questionnaire: questionnaireData ? JSON.parse(questionnaireData) : null,
           experiment: experimentResults ? JSON.parse(experimentResults) : null,
           colorVocabulary: null,
+          colorEmotion: null,
           submitted_at: new Date().toISOString(),
           page_url: window.location.href
         });
