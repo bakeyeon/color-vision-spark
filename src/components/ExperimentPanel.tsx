@@ -79,16 +79,16 @@ function getKoreanBlueTrialConfig(): {
       [170, 205, 244], // Pastel blue
     ];
     const r = Math.random();
-    if (r < 0.3) return { category: "traditional", colorEnd: BASE_BLUE };
+    if (r < 0.3) return { category: "blue-white", colorEnd: BASE_BLUE };
     if (r < 0.6)
       return {
-        category: "traditional",
+        category: "blue-white",
         colorEnd:
           INTERMEDIATE_ENDPOINTS[
             Math.floor(Math.random() * INTERMEDIATE_ENDPOINTS.length)
           ],
       };
-    return { category: "traditional", colorEnd: WHITE };
+    return { category: "blue-white", colorEnd: WHITE };
   }
 
   return { category };
@@ -241,15 +241,15 @@ const ExperimentPanel: React.FC<ExperimentPanelProps> = ({ onComplete }) => {
   const getCategoryDescription = (category: KoreanBlueCategory): string => {
     switch (category) {
       case "blue-cyan":
-        return "Blue transitioning toward cyan/teal (blue + green boundary)";
+        return "blue + green boundary";
       case "blue-violet":
-        return "Blue transitioning toward violet/purple (blue + red boundary)";
+        return "blue + red boundary";
       case "blue-sky":
-        return "Blue transitioning toward sky blue (blue + white)";
+        return "blue + white boundary";
       case "blue-navy":
-        return "Blue transitioning toward navy (blue + black)";
+        return "blue + black boundary";
       default:
-        return "Traditional blue to white/pale blue gradient";
+        return "blue + white boundary";
     }
   };
 
