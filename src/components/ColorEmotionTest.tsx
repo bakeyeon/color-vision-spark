@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 // Define types for the orphaned code
 interface QuestionnaireData {
@@ -13,11 +13,8 @@ interface QuestionnaireData {
 interface TrialResult {
   [key: string]: any;
 }
-
-interface EmotionData extends ColorEmotionData {}
-
-// Define Google Apps Script URL
-const GOOGLE_APPS_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+// Keep EmotionData alias for backward compatibility with older code snippets
+// It is defined after ColorEmotionData below.
 
 // Images imported as ES6 modules
 import blue1 from "/public/images/blue/blue1.png";
@@ -29,6 +26,9 @@ import green3 from "/public/images/green/green3.png";
 import teal1 from "/public/images/teal/teal1.png";
 import teal2 from "/public/images/teal/teal2.png";
 import teal3 from "/public/images/teal/teal3.png";
+// Google Apps Script URL (kept for legacy code paths)
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVgRCzvDu0kcNcnEYyjCVytVQDifjj41LinJ3IrojQU9UI-Q1GcUJryXO8z-GZlZcI/exec";
+
 export interface ColorEmotionData {
   blueEmotion: string;
   greenEmotion: string;
@@ -39,6 +39,9 @@ export interface ColorEmotionData {
     teal: string;
   };
 }
+
+// Define EmotionData alias after interface is declared
+export type EmotionData = ColorEmotionData;
 interface ColorEmotionTestProps {
   onComplete: (data: ColorEmotionData) => void;
   onSkip: () => void;
@@ -125,6 +128,43 @@ const ColorEmotionTest: React.FC<ColorEmotionTestProps> = ({
     };
     onComplete(data);
   };
+
+  // Function to save dataset and send to Google Sheets (kept from earlier code)
+  const saveDataToSheets = async (dataToSave: any, form: EmotionData) => {
+    // Load the existing dataset array (or create a new one)
+    const datasetRaw = localStorage.getItem("experimentDataset");
+    let dataset: any[] = [];
+    if (datasetRaw) {
+      try {
+        dataset = JSON.parse(datasetRaw);
+        if (!Array.isArray(dataset)) dataset = [];
+      } catch {
+        dataset = [];
+      }
+    }
+    dataset.push(dataToSave);
+    localStorage.setItem("experimentDataset", JSON.stringify(dataset));
+
+    try {
+      // Try to send data to Google Sheets
+      await sendToGoogleSheets(form as any);
+
+      setTimeout(() => {
+        // Clean up individual keys for future compatibility? (Optional: keep for now)
+        onComplete(form);
+      }, 400);
+    } catch (error) {
+      toast({
+        title: "Data Saved Locally",
+        description: "Your responses are saved and can be accessed by the researcher.",
+      });
+      
+      setTimeout(() => {
+        onComplete(form);
+      }, 400);
+    }
+  };
+
   const isSubmitDisabled = !blueEmotion.trim() && !greenEmotion.trim() && !tealEmotion.trim();
   return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-950 dark:to-teal-950 flex items-center justify-center p-4">
       <Card className="w-full max-w-4xl mx-auto">
@@ -185,43 +225,6 @@ const ColorEmotionTest: React.FC<ColorEmotionTestProps> = ({
         </CardFooter>
       </Card>
     </div>;
-  // Function to save dataset and send to Google Sheets
-  const saveDataToSheets = async (dataToSave: any, form: EmotionData) => {
-    // Load the existing dataset array (or create a new one)
-    const datasetRaw = localStorage.getItem("experimentDataset");
-    let dataset: any[] = [];
-    if (datasetRaw) {
-      try {
-        dataset = JSON.parse(datasetRaw);
-        if (!Array.isArray(dataset)) dataset = [];
-      } catch {
-        dataset = [];
-      }
-    }
-    dataset.push(dataToSave);
-    localStorage.setItem("experimentDataset", JSON.stringify(dataset));
-
-    try {
-      // Try to send data to Google Sheets
-      await sendToGoogleSheets(form as any);
-
-      setTimeout(() => {
-        // Clean up individual keys for future compatibility? (Optional: keep for now)
-        onComplete(form);
-      }, 400);
-    } catch (error) {
-      toast({
-        title: "Data Saved Locally",
-        description: "Your responses are saved and can be accessed by the researcher.",
-      });
-      
-      setTimeout(() => {
-        onComplete(form);
-      }, 400);
-    }
-  };
 };
-
-export type { EmotionData };
 
 export default ColorEmotionTest;

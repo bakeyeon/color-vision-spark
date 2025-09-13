@@ -55,6 +55,9 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     const storedColorVocab = localStorage.getItem("colorVocabularyData");
     const colorVocabularyResults = storedColorVocab ? JSON.parse(storedColorVocab) : null;
 
+    const storedEmotion = localStorage.getItem("colorEmotionData");
+    const colorEmotionTest = storedEmotion ? JSON.parse(storedEmotion) : null;
+
     try {
       const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: "POST",
@@ -66,6 +69,7 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
           questionnaire: data,
           experiment: experimentResults,
           colorVocabulary: colorVocabularyResults,
+          colorEmotionTest: colorEmotionTest,
           submitted_at: new Date().toISOString(),
           page_url: window.location.href
         })
@@ -104,10 +108,15 @@ const Questionnaire: React.FC<Props> = ({ onComplete }) => {
     const storedColorVocab = localStorage.getItem("colorVocabularyData");
     const colorVocabularyResults = storedColorVocab ? JSON.parse(storedColorVocab) : null;
 
+    const storedEmotion = localStorage.getItem("colorEmotionData");
+    const colorEmotionTest = storedEmotion ? JSON.parse(storedEmotion) : null;
+
     const dataToSave = {
       questionnaire: form,
       experiment: experimentResults,
       colorVocabulary: colorVocabularyResults,
+      colorEmotion: colorEmotionTest, // for AdminPanel compatibility
+      colorEmotionTest: colorEmotionTest, // for Google Apps Script compatibility
       submitted_at: new Date().toISOString(),
       page_url: window.location.href
     };
