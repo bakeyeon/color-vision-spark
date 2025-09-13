@@ -35,7 +35,7 @@ const yearsOpts = [
 ];
 
 // Google Apps Script 웹앱 URL
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVgRCzvDu0kcNcnEYyjCVytVQDifjj41LinJ3IrojQU9UI-Q1GcUJryXO8z-GZlZcI/exec";
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUaKGz7DmgLyYirCa3A1xKWO6A3pHLopmn0hbQGlWecgjON3spyS6FY8EU29fMQBG_/exec";
 
 const Questionnaire: React.FC<Props> = ({ onComplete }) => {
   const [form, setForm] = useState<Partial<QuestionnaireData>>({});
