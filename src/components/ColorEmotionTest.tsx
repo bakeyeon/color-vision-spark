@@ -54,6 +54,46 @@ const ColorEmotionTest: React.FC<ColorEmotionTestProps> = ({
   });
 
   
+  const sendToGoogleSheets = async (data: QuestionnaireData) => {
+    const storedResults = localStorage.getItem("experimentResults");
+    const experimentResults: TrialResult[] | null = storedResults ? JSON.parse(storedResults) : null;
+    
+    const storedColorVocab = localStorage.getItem("colorVocabularyData");
+    const colorVocabularyResults = storedColorVocab ? JSON.parse(storedColorVocab) : null;
+
+    try {
+      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        mode: "no-cors", // Google Apps Script requires no-cors
+        body: JSON.stringify({
+          questionnaire: data,
+          experiment: experimentResults,
+          colorVocabulary: colorVocabularyResults,
+          submitted_at: new Date().toISOString(),
+          page_url: window.location.href
+        })
+      });
+
+      console.log("Data successfully sent to Google Sheets");
+      toast({
+        title: "Survey Submitted!",
+        description: "Your responses were sent to Google Sheets successfully.",
+      });
+    } catch (err) {
+      console.error("Error sending to Google Sheets:", err);
+      toast({
+        variant: "destructive",
+        title: "Failed to send data to Google Sheets.",
+        description: "Please check your internet connection and try again.",
+      });
+      throw err;
+    }
+  };
+
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -131,5 +171,44 @@ const ColorEmotionTest: React.FC<ColorEmotionTestProps> = ({
       </Card>
     </div>;
 };
+
+  // Load the existing dataset array (or create a new one)
+    const datasetRaw = localStorage.getItem("experimentDataset");
+    let dataset: any[] = [];
+    if (datasetRaw) {
+      try {
+        dataset = JSON.parse(datasetRaw);
+        if (!Array.isArray(dataset)) dataset = [];
+      } catch {
+        dataset = [];
+      }
+    }
+    dataset.push(dataToSave);
+    localStorage.setItem("experimentDataset", JSON.stringify(dataset));
+
+    try {
+      // Try to send data to Google Sheets
+      await sendToGoogleSheets(form as EmotionData);
+
+      setTimeout(() => {
+        setSubmitting(false);
+
+        // Clean up individual keys for future compatibility? (Optional: keep for now)
+        onComplete(form as EmotionData);
+      }, 400);
+    } catch (error) {
+      toast({
+        title: "Data Saved Locally",
+        description: "Your responses are saved and can be accessed by the researcher.",
+      });
+      
+      setTimeout(() => {
+        setSubmitting(false);
+        onComplete(form as EmotionData);
+      }, 400);
+    }
+  };
+
+export type { EmotionData };
 
 export default ColorEmotionTest;
