@@ -3,6 +3,21 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/use-toast";
+
+// Define types for the orphaned code
+interface QuestionnaireData {
+  [key: string]: any;
+}
+
+interface TrialResult {
+  [key: string]: any;
+}
+
+interface EmotionData extends ColorEmotionData {}
+
+// Define Google Apps Script URL
+const GOOGLE_APPS_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
 
 // Images imported as ES6 modules
 import blue1 from "/public/images/blue/blue1.png";
@@ -170,9 +185,9 @@ const ColorEmotionTest: React.FC<ColorEmotionTestProps> = ({
         </CardFooter>
       </Card>
     </div>;
-};
-
-  // Load the existing dataset array (or create a new one)
+  // Function to save dataset and send to Google Sheets
+  const saveDataToSheets = async (dataToSave: any, form: EmotionData) => {
+    // Load the existing dataset array (or create a new one)
     const datasetRaw = localStorage.getItem("experimentDataset");
     let dataset: any[] = [];
     if (datasetRaw) {
@@ -188,13 +203,11 @@ const ColorEmotionTest: React.FC<ColorEmotionTestProps> = ({
 
     try {
       // Try to send data to Google Sheets
-      await sendToGoogleSheets(form as EmotionData);
+      await sendToGoogleSheets(form as any);
 
       setTimeout(() => {
-        setSubmitting(false);
-
         // Clean up individual keys for future compatibility? (Optional: keep for now)
-        onComplete(form as EmotionData);
+        onComplete(form);
       }, 400);
     } catch (error) {
       toast({
@@ -203,11 +216,11 @@ const ColorEmotionTest: React.FC<ColorEmotionTestProps> = ({
       });
       
       setTimeout(() => {
-        setSubmitting(false);
-        onComplete(form as EmotionData);
+        onComplete(form);
       }, 400);
     }
   };
+};
 
 export type { EmotionData };
 
