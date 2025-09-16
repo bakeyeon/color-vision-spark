@@ -195,7 +195,20 @@ const AppHome: React.FC = () => {
 
   const assignUserClusterGroup = (): ClusterGroup => {
     if (skipCount > 6) return 7;
-    return assignClusterGroup({ results });
+    
+    // 컬러 이모션 응답 수 계산 (3개 색상 중 응답한 수)
+    const colorEmotionAnswers = colorEmotion ? 
+      [colorEmotion.blueEmotion, colorEmotion.greenEmotion, colorEmotion.tealEmotion]
+        .filter(emotion => emotion && emotion.trim() !== '').length : 0;
+    
+    // 주간 미디어 이용 시간 (인구통계 데이터에서)
+    const mediaHours = demographics?.mediaHours ? parseInt(demographics.mediaHours) || 0 : 0;
+    
+    return assignClusterGroup({ 
+      results, 
+      colorEmotionAnswers, 
+      mediaHours 
+    });
   };
 
   // Exclude the main group when picking the two closest fish for display
